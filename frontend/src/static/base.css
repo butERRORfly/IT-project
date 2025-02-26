@@ -1,0 +1,38 @@
+html, body {
+    height: 100%;
+    margin: 0;
+    line-height: 1.6;
+    font-family: 'Ubuntu', sans-serif;
+}
+
+*,
+*:before,
+*:after {
+    box-sizing: border-box;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    margin: 0;
+}
+
+.container {
+    width: 100%;
+    max-width: 1280px;
+    margin: 0 auto;
+
+
+    display: grid;
+    grid-template-rows: auto 1fr auto; /* Шапка, контент, футер */
+    min-height: 100vh;
+}
+
+header {
+    text-align: center;
+    padding: 10px 0;
+}
+
+
+footer {
+    text-align: center;
+    padding: 10px 0;
+}
