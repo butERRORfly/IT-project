@@ -15,3 +15,7 @@ class UserRegister(BaseModel):
         if not re.match(r'^\+\d{5,15}$', value):
             raise ValueError('Номер телефона должен начинаться с "+" и содержать от 5 до 15 цифр')
         return value
+
+class UserAuth(BaseModel):
+    email: EmailStr = Field(..., description="Электронная почта")
+    password: str = Field(..., min_length=5, max_length=50, description="Пароль, от 5 до 50 знаков")
