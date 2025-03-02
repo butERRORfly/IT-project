@@ -8,4 +8,4 @@ app = FastAPI(title=settings.PROJECT_NAME, version=settings.PROJECT_VERSION)
 app.include_router(api_router)
 app.mount("/src/adapters/entrypoints/static", StaticFiles(directory="src/adapters/entrypoints/static"), name="static")
 
-templates = Jinja2Templates(directory="src/adapters/entrypoints/statictemplates")
+templates = Jinja2Templates(directory="src/adapters/entrypoints/templates")
