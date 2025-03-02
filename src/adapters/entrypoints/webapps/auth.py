@@ -2,7 +2,7 @@ from passlib.context import CryptContext
 from jose import jwt
 from datetime import datetime, timedelta, timezone
 from pydantic import EmailStr
-from src.adapters.db.dao.users import UsersDAO
+from src.infrastructure.db.dao.users import UsersDAO
 from src.configurator.config import get_auth_data
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")

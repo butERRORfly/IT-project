@@ -1,6 +1,6 @@
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.future import select
-from src.adapters.db.database import async_session_maker
+from src.infrastructure.db.database import async_session_maker
 
 class BaseDAO:
     model = None

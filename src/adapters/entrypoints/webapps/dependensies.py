@@ -2,8 +2,8 @@ from fastapi import Request, HTTPException, status, Depends
 from jose import jwt, JWTError
 from datetime import datetime, timezone
 from src.configurator.config import get_auth_data
-from src.adapters.db.dao.users import UsersDAO
-from src.domain.models.users.users import User
+from src.infrastructure.db.dao.users import UsersDAO
+from src.infrastructure.db.database import User
 
 
 def get_token(request: Request):
@@ -55,4 +55,3 @@ async def get_current_admin_user(current_user: User = Depends(get_current_user))
     if current_user.is_admin:
         return current_user
     raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Недостаточно прав!')
-

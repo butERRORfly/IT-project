@@ -1,9 +1,9 @@
 from fastapi import APIRouter, HTTPException, status, Response, Depends
-from src.adapters.entrypoints.api.v1.users.auth import get_password_hash, create_access_token, authenticate_user
-from src.adapters.db.dao.users import UsersDAO
-from src.domain.models.users.users import User
-from src.domain.schemas.users import UserRegister, UserAuth
-from src.adapters.entrypoints.api.v1.users.dependensies import get_current_user, get_current_admin_user
+from src.adapters.entrypoints.webapps.auth import get_password_hash, create_access_token, authenticate_user
+from src.infrastructure.db.dao.users import UsersDAO
+from src.infrastructure.db.database import User
+from src.domain.schemas.users import UserRegister, UserAuth, UserChangeRole
+from src.adapters.entrypoints.webapps.dependensies import get_current_user, get_current_admin_user
 
 router = APIRouter()
 
@@ -47,3 +47,8 @@ async def logout_user(response: Response):
 @router.get("/all_users/", summary="Список пользователей")
 async def get_all_users(user_data: User = Depends(get_current_admin_user)):
     return await UsersDAO.find_all()
+
+
+@router.post("/set_role/", summary="Выдать роль")
+async def set_admin_role(response: Response, user_data: UserChangeRole):
+    ...
