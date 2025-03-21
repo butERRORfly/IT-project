@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <link rel="stylesheet" href="/src/adapters/entrypoints/static/map.css">
+    <script type="text/javascript" src="https://api-maps.yandex.ru/2.1/?apikey=6a4c745a-8968-455d-8801-aef21ebfa91b&lang=ru_RU"></script>
+</head>
+<header>
+  <div class="logo">
+    <img src="src/adapters/entrypoints/static/airplane_plane_travel_travels_icon_159298.png" alt="Logo">
+  </div>
+  <div class="menu">
+    <ul>
+      <li> <a>Мои путешествия</a></li>
+      <li><a>Выход</a></li>
+    </ul>
+  </div>
+</header>
+
+<body>
+
+<div class="map-container">
+    <div id="map"></div>
+    <div class="sidebar">
+        {% for i in range(data["loc"] | length) %}
+        <div class="point" id="point-{{ i }}">
+            <p>Точка посещения: {{ data["loc"][i] }}</p>
+            <p>Дата прибытия: {{ data["date_to"][i] }} </p>
+            <p>Дата отбытия: {{ data["date_out"][i] }}</p>
+            <p>Гостиница: {{ data["gost"][i] }}</p>
+            <p>{{ data["wait"][i]}}</p>
+            <p> {{data["cost"][i]}}</p>
+            <p><a href={{data["rec"][i]}}>Забронировать гостиницу</a></p>
+        </div>
+        {% endfor %}
+    </div>
+    <div class="point">
+        total price in USD - {{data["total_score"]}}
+    </div>
+
+</div>
+    <script>
+   ymaps.ready(function () {
+    var map = new ymaps.Map("map", {
+        center: [55.76, 37.64],
+        zoom: 3,
+        controls: ["zoomControl", "searchControl"]
+    });
+
+    var locations = {{ data["loc"] | safe }};
+    var coordinates = [];
+
+    function addPolyline() {
+        if (coordinates.length > 1) {
+            var polyline = new ymaps.Polyline(
+                coordinates,
+                {
+                    hintContent: 'Линия между городами'
+                },
+                {
+                    strokeColor: "#0000FF",
+                    strokeWidth: 4,
+                    strokeOpacity: 0.7
+                }
+            );
+            map.geoObjects.add(polyline);
+        }
+    }
+
+    function geocodeLocation(location) {
+        return new Promise(function(resolve, reject) {
+            var geocoder = ymaps.geocode(location);
+            geocoder.then(function(res) {
+                var geoObject = res.geoObjects.get(0);
+                if (geoObject) {
+                    var coords = geoObject.geometry.getCoordinates();
+                    resolve(coords);
+                } else {
+                    reject("Не удалось получить координаты для " + location);
+                }
+            }).catch(function(err) {
+                reject("Ошибка геокодирования для адреса: " + location + ", " + err);
+            });
+        });
+    }
+
+
+    var promiseChain = Promise.resolve();
+    locations.forEach(function(location, index) {
+        promiseChain = promiseChain
+            .then(function() {
+                return geocodeLocation(location);
+            })
+            .then(function(coords) {
+                coordinates.push(coords);
+                var placemark = new ymaps.Placemark(coords, {
+                    balloonContent: location
+                });
+                map.geoObjects.add(placemark);
+                addPolyline();
+            })
+            .catch(function(err) {
+                console.error(err);
+            });
+    });
+
+});
+
+    </script>
+<button class="fixed-button">Сохранить путешествие</button>
+</body>
+</html>
