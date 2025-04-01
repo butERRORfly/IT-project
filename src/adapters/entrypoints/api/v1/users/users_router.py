@@ -50,5 +50,27 @@ async def get_all_users(user_data: User = Depends(get_current_admin_user)):
 
 
 @router.post("/set_role/", summary="Выдать роль")
-async def set_admin_role(response: Response, user_data: UserChangeRole):
-    ...
+async def set_admin_role(
+        role_data: UserChangeRole,
+        current_user: User = Depends(get_current_admin_user)
+):
+    if not current_user.is_admin:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Только администратор может изменять роли"
+        )
+
+    user = await UsersDAO.find_one_or_none(email=role_data.email)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Пользователь с указанным email не найден"
+        )
+
+    await UsersDAO.update(
+        user.id,
+        is_admin=role_data.is_admin,
+        is_super_admin=role_data.is_super_admin
+    )
+
+    return {"message": f"Роль пользователя {role_data.email} успешно обновлена"}
