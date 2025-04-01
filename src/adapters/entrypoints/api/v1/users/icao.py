@@ -78,7 +78,7 @@ async def submit_data(request: Request, forms: List[FormData]):
     req = [i.point for i in forms]
     print(req)
     req = {
-        'total_score': str(sum([float(i.convertedRate) for i in forms])),
+        'total_score': str(sum([float(i.convertedRate.replace('-USD','')) for i in forms])),
         'loc': [i.point for i in forms if i.point != ''],
         'date_to': [i.date_to for i in forms],
         'date_out': [i.date_out for i in forms],
