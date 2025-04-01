@@ -16,7 +16,7 @@ import requests
 from datetime import datetime
 from dataclasses import dataclass
 
-secret_key_api = '6a4c745a-8968-455d-8801-aef21ebfa91b'
+secret_key_api = ''
 rout = APIRouter()
 templates = Jinja2Templates(directory="src/adapters/entrypoints/templates")
 
