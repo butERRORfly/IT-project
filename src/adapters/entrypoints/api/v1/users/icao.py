@@ -3,7 +3,6 @@ from starlette.requests import Request
 from starlette.responses import RedirectResponse
 
 from src.adapters.entrypoints.webapps.auth import get_password_hash, create_access_token, authenticate_user
-from src.infrastructure.db.dao.users import UsersDAO, AirDAO
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi import FastAPI, Form
 from typing import List
