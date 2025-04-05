@@ -1,0 +1,115 @@
+
+body {
+    font-family: Optima;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    background-image: url('0_fMz62Ks_u0QvVQ1E.png');
+    background-size: cover;
+    background-position: center center;
+    background-attachment: fixed;
+}
+
+
+.form-container-wrapper {
+    background-color: #fff;
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 700px;
+    text-align: center;
+    overflow-y: auto;
+    max-height: 600px;
+    position: relative;
+}
+
+
+.form-container {
+    margin-bottom: 30px;
+    border-radius:12px;
+    border: 1px solid #ccc;
+}
+
+.form-item {
+    margin-bottom: 20px;
+}
+
+.form-item label {
+    display: block;
+    font-size: 20px;
+    margin-bottom: 10px;
+}
+
+.form-item input {
+    width: 80%;
+    padding: 15px;
+    margin-top: 10px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    font-size: 18px;
+}
+
+
+.add-button {
+    padding: 15px 30px;
+/*margin-top: 30px;  /* Расположена под последней формой */
+    border-radius: 25px;
+    border: none;
+    background-color: #4CAF50;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    padding-left: 20px;
+}
+
+.add-button:hover {
+    background-color: #45a049;
+}
+
+h1 {
+    text-align: center;
+    color: #333;
+    font-size: 20px;
+    margin-bottom: 40px;
+}
+
+.plan{
+    font-family: Optima;
+    text-align: center;
+    font-size: 30px;
+    margin-bottom: 40px;
+    color: hsla(0, 0%, 0%, 0.5);
+}
+.intr{
+    text-align: center;
+    font-size: 20px;
+    margin-top: 12px;
+}
+.name{
+    text-align: left;
+    margin-left: 15px;
+    margin-top:10px;
+}
+.end{
+    padding: 15px 30px;
+    margin-top: 30px; 
+    border-radius: 25px;
+    border: none;
+    background-color: #4CAF50;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+.form{
+padding-left:20px;
+}
+ #map {
+ width: 600px;
+ height: 400px;
+
+
+}

@@ -1,0 +1,132 @@
+.map-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    width: 100%;
+    height: 590px;
+}
+
+#map {
+    width: 60%;
+    height: 100%;
+}
+
+.sidebar {
+    width: 35%;
+    height: 100%;
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+.point {
+    border: 2px solid #333;
+    border-radius: 30px;
+    margin: 10px;
+    padding: 10px;
+    box-sizing: border-box;
+    overflow: hidden;
+    word-wrap: break-word;
+}
+
+p {
+    margin: 5px 0;
+}
+.line {
+    position: absolute;
+    width: 2px;
+    background-color: #333;
+    transform-origin: top left;
+    z-index: -1;
+}
+
+.map-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: #f5f5f5;
+  padding: 20px;
+  gap: 20px; /* Отступы между детьми */
+}
+
+
+
+
+
+/* НАстройка головы*/
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  background-color:#D3D3D3;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+header .logo img {
+  height: 40px;
+  width: auto;
+}
+
+
+header .menu ul {
+  list-style: none;
+  display: flex;
+  gap: 30px;
+}
+
+header .menu ul li {
+  position: relative;
+}
+
+header .menu ul li a {
+  text-decoration: none;
+  color: #333;
+  font-size: 16px;
+  font-weight: bold;
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 2px solid #333;
+  border-radius: 30px;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+header .menu ul li a:hover {
+  background-color: #f2f2f2;
+  border-color: #f39c12;
+}
+
+
+header .menu ul li a img {
+  width: 20px;
+  height: 20px;
+}
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Optima;
+}
+
+/*КНопочка для сохранения маршрута*/
+.fixed-button {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height:10%;
+  padding: 15px 0;
+  font-size: 25px;
+  background-color:  #45a049;
+  color: white;
+  border: none;
+  box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+
+.fixed-button:hover {
+  background-color: #c0392b;
+}

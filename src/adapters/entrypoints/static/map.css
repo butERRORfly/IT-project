@@ -1,0 +1,280 @@
+.map-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    width: 100%;
+    height: 100%;
+}
+
+.sidebar-grid {
+  position: absolute;
+  right: 0%;
+  top: 9%;
+  max-height: 79%;
+  display: flex;
+  flex-direction: column;
+}
+@media (max-width: 768px) {
+    .sidebar-grid {
+        width: 100%;
+        bottom: 13%;
+        right: auto;
+        top: auto;
+        max-height: 52%;
+    }
+}
+@media (max-height: 768px) {
+    .sidebar-grid {
+        top: auto;
+        bottom: 10%;
+        max-height: 69%;
+    }
+}
+
+.summ-price {
+  font-size: 1.2rem;
+  color: #2196F3;
+  height: 10%;
+  max-height: 30%;
+  background-color: rgba(255, 255, 255, 0.60);
+  border-radius: 15px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+  overflow-y: auto;
+  padding: 5px;
+  margin: 5px;
+  margin-bottom: 0px;
+  box-sizing: border-box;
+}
+@media (max-width: 768px) {
+    .summ-price {
+        position: relative;
+        height: 15%;
+    }
+}
+
+.overlay-container {
+  background-color: rgba(255, 255, 255, 0.60);
+  border-radius: 15px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+  overflow-y: auto;
+  padding: 5px;
+  margin: 5px;
+  box-sizing: border-box;
+}
+@media (max-width: 768px) {
+    .overlay-container {
+        position: relative;
+    }
+}
+
+.sidebar {
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+}
+@media (max-width: 768px) {
+    .sidebar {
+        display: flex;
+        flex-direction: row;
+    }
+}
+
+.map-page {
+  /*display: flex;
+  flex-direction: column;*/
+  /*min-height: 100vh; */
+  background-color: #f5f5f5;
+  /*padding: 20px;*/
+  gap: 20px; /* Отступы между детьми */
+}
+
+#map {
+    width: 60%;
+    height: 100%;
+}
+
+.ymaps-2-1-79-map {
+  width: 100% !important;
+  height: 81.5vh !important;
+}
+@media (max-height: 768px) {
+    .ymaps-2-1-79-map {
+        height: 71.5vh !important;
+    }
+}
+
+/*----------LE POINT---------*/
+.point {
+    border: 2px solid #333;
+    border-radius: 30px;
+    margin: 10px;
+    padding: 10px;
+    box-sizing: border-box;
+    overflow: hidden;
+    word-wrap: break-word;
+    height: 100%;
+}
+.route-point {
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 16px;
+  margin: 12px 0;
+  font-family: 'Segoe UI', sans-serif;
+  max-width: 500px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.point-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.point-header h3 {
+  margin: 0;
+  font-size: 1.2rem;
+  color: #333;
+}
+
+.badge {
+  background: #4CAF50;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 16px;
+  font-size: 0.8rem;
+}
+
+.point-dates {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 12px;
+  color: #555;
+}
+
+.hotel-label {
+  font-weight: 600;
+  margin-right: 4px;
+}
+
+.label {
+  font-weight: 600;
+  margin-right: 4px;
+}
+
+.point-price {
+  font-size: 1.1rem;
+  margin: 12px 0;
+  color: #2196F3;
+}
+
+.booking-btn {
+  display: block;
+  text-align: center;
+  background: #2196F3;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 6px;
+  text-decoration: none;
+  transition: background 0.3s;
+}
+
+.booking-btn:hover {
+  background: #0b7dda;
+}
+
+/*----------LE POINT---------*/
+p {
+    margin: 5px 0;
+}
+.line {
+    position: absolute;
+    width: 2px;
+    background-color: #333;
+    transform-origin: top left;
+    z-index: -1;
+}
+
+
+
+
+
+
+/* НАстройка головы*/
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  background-color:#4b4b4b;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+header .logo img {
+  height: 40px;
+  width: auto;
+}
+
+
+header .menu ul {
+  list-style: none;
+  display: flex;
+  gap: 30px;
+}
+
+header .menu ul li {
+  position: relative;
+}
+
+header .menu ul li a {
+  text-decoration: none;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: bold;
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 2px solid #ffffff;
+  border-radius: 30px;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+header .menu ul li a:hover {
+  background-color: #f2f2f2;
+  border-color: #f39c12;
+}
+
+
+header .menu ul li a img {
+  width: 20px;
+  height: 20px;
+}
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Optima;
+}
+
+/*КНопочка для сохранения маршрута*/
+.fixed-button {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height:10%;
+  padding: 15px 0;
+  font-size: 25px;
+  background-color:  #45a049;
+  color: white;
+  border: none;
+  box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+
+.fixed-button:hover {
+  background-color: #c0392b;
+}
