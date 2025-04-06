@@ -64,17 +64,17 @@
     </style>
 
     <div class="login-container">
-        <h2>Login</h2>
+        <h2>Вход</h2>
         <form id="loginForm" action="/auth/login/" method="POST">
             <div class="form-group">
-                <label for="email">Email</label>
+                <label for="email">Почта</label>
                 <input type="email" id="email" name="email" required>
             </div>
             <div class="form-group">
-                <label for="password">Password</label>
+                <label for="password">Пароль</label>
                 <input type="password" id="password" name="password" required>
             </div>
-            <button type="submit">Login</button>
+            <button type="submit">Войти</button>
             <div id="errorMessage" class="error"></div>
             <div class="register-link">
                 Нет аккаунта? <a href="/auth/register/">Зарегистрироваться</a>
@@ -102,7 +102,7 @@
                 });
 
                 if (response.ok) {
-                    window.location.href = '/auth/profile/';
+                    window.location.href = '/users/profile/';
                 } else {
                     const data = await response.json();
                     document.getElementById('errorMessage').textContent = data.detail || 'Login failed';
