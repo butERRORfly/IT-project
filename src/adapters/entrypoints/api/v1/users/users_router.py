@@ -25,6 +25,11 @@ async def register_user(user_data: UserRegister) -> dict:
     return {'message': 'Вы успешно зарегистрированы!'}
 
 
+@router.get("/register/", response_class=HTMLResponse, summary="Страница регистрации")
+async def register_page(request: Request):
+    return templates.TemplateResponse("register.html", {"request": request})
+
+
 @router.post("/login/", summary="Вход в систему")
 async def auth_user(response: Response, user_data: UserAuth):
     check = await authenticate_user(email=user_data.email, password=user_data.password)
@@ -36,7 +41,7 @@ async def auth_user(response: Response, user_data: UserAuth):
     return {'access_token': access_token, 'refresh_token': None}
 
 
-@router.get("/login/", response_class=HTMLResponse, summary="Вход в систему")
+@router.get("/login/", response_class=HTMLResponse, summary="Страница вход в систему")
 async def login_page(request: Request):
     return templates.TemplateResponse("login.html", {"request": request})
 
