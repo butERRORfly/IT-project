@@ -1,4 +1,6 @@
-from fastapi import APIRouter, HTTPException, status, Response, Depends
+from fastapi import APIRouter, HTTPException, status, Response, Depends, Request
+from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.templating import Jinja2Templates
 from src.adapters.entrypoints.webapps.auth import get_password_hash, create_access_token, authenticate_user
 from src.infrastructure.db.dao.users import UsersDAO
 from src.infrastructure.db.database import User
@@ -6,6 +8,7 @@ from src.domain.schemas.users import UserRegister, UserAuth, UserChangeRole
 from src.adapters.entrypoints.webapps.dependensies import get_current_user, get_current_admin_user
 
 router = APIRouter()
+templates = Jinja2Templates(directory="src/adapters/entrypoints/templates")
 
 
 @router.post("/register/", summary="Регистрация")
@@ -33,15 +36,25 @@ async def auth_user(response: Response, user_data: UserAuth):
     return {'access_token': access_token, 'refresh_token': None}
 
 
-@router.get("/profile/", summary="Профиль пользователя")
-async def get_me(user_data: User = Depends(get_current_user)):
-    return user_data
+@router.get("/login/", response_class=HTMLResponse, summary="Вход в систему")
+async def login_page(request: Request):
+    return templates.TemplateResponse("login.html", {"request": request})
+
+
+@router.get("/profile/", response_class=HTMLResponse, summary="Профиль пользователя")
+async def profile_page(request: Request, user: User = Depends(get_current_user)):
+    return templates.TemplateResponse("profile.html", {"request": request, "user": user})
 
 
 @router.post("/logout/", summary="Выход")
 async def logout_user(response: Response):
-    response.delete_cookie(key="users_access_token")
-    return {'message': 'Пользователь успешно вышел из системы'}
+    redirect_response = RedirectResponse(
+        url="/auth/login/",
+        status_code=status.HTTP_303_SEE_OTHER
+    )
+    redirect_response.delete_cookie(key="users_access_token")
+    # response.set_cookie(key="flash_message", value="Вы успешно вышли", max_age=5)
+    return redirect_response
 
 
 @router.get("/all_users/", summary="Список пользователей")

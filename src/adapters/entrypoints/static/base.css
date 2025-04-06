@@ -31,6 +31,11 @@ header {
     padding: 10px 0;
 }
 
+main {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 
 footer {
     text-align: center;
