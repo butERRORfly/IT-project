@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <link rel="stylesheet" href="/src/adapters/entrypoints/static/map.css">
-    <script type="text/javascript" src="https://api-maps.yandex.ru/2.1/?apikey=&lang=ru_RU"></script>
+    <script type="text/javascript" src="https://api-maps.yandex.ru/2.1/?apikey=6a4c745a-8968-455d-8801-aef21ebfa91b&lang=ru_RU"></script>
 </head>
 <header>
   <div class="logo">
@@ -12,6 +12,7 @@
   </div>
   <div class="menu">
     <ul>
+        <li><a>Опубликовать</a></li>
       <li> <a>Мои путешествия</a></li>
       <li><a>Выход</a></li>
     </ul>
@@ -31,16 +32,46 @@
             <p>Гостиница: {{ data["gost"][i] }}</p>
             <p>{{ data["wait"][i]}}</p>
             <p> {{data["cost"][i]}}</p>
+            <p class = "rater-{{ i }}" id = "rater-{{ i }}">00:00:00</p>
             <p><a href={{data["rec"][i]}}>Забронировать гостиницу</a></p>
+        </div>
+        <div class="point" >
         </div>
         {% endfor %}
     </div>
-    <div class="point">
-        total price in USD - {{data["total_score"]}}
+    <div class= "point">
+        <p>total price in <p2 id="rater">USD</p2> -
+            <p1 id = 'summary'>{{data["total_score"]}}</p1>
+        </p>
+        <select id="selector"></select>
     </div>
 
 </div>
     <script>
+    function delay(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        function spliter(time){
+            return time.split(' ')[1];
+        }
+
+
+        async function get_data_by_region(attitude,latitude){
+    try{
+    const apiKey = '17EMDDSCAKIF'; //  будем получать от сервера, пока храним в открытом виде
+    const url = `http://api.timezonedb.com/v2.1/get-time-zone?key=${apiKey}&format=json&by=position&lat=${attitude}&lng=${latitude}`;
+    let response = await fetch(url);
+    const data = await response.json();
+    await delay(2000);
+    return data;
+    }
+    catch (error) {
+    console.error('Error during data retrieval:', error);
+    return null;
+  }
+ }
+
    ymaps.ready(function () {
     var map = new ymaps.Map("map", {
         center: [55.76, 37.64],
@@ -50,6 +81,7 @@
 
     var locations = {{ data["loc"] | safe }};
     var coordinates = [];
+    var validator = [];
 
     function addPolyline() {
         if (coordinates.length > 1) {
@@ -65,6 +97,8 @@
                 }
             );
             map.geoObjects.add(polyline);
+
+
         }
     }
 
@@ -85,7 +119,6 @@
         });
     }
 
-
     var promiseChain = Promise.resolve();
     locations.forEach(function(location, index) {
         promiseChain = promiseChain
@@ -94,6 +127,7 @@
             })
             .then(function(coords) {
                 coordinates.push(coords);
+                validator.push(coords);
                 var placemark = new ymaps.Placemark(coords, {
                     balloonContent: location
                 });
@@ -101,13 +135,39 @@
                 addPolyline();
             })
             .catch(function(err) {
+                validator.push(0)
                 console.error(err);
+
             });
     });
+    promiseChain.then(async function() {
+        for (let i = 0; i < validator.length; i++){
+            await new Promise(resolve => setTimeout(resolve, 500));
+            if (validator[i] == 0){
+            console.log('error');
+            let region_time = document.getElementById(`rater-${i}`);
+            region_time.innerText = 'data by time not found';
+            }
+            else{
+                get_data_by_region(validator[i][0],validator[i][1]).then(function(data){
+                if (data.status == 'OK'){
+                    console.log('success');
+                    let region_time = document.getElementById(`rater-${i}`);
+                    region_time.innerText = `${spliter(data.formatted)}`;
+
+                }
+
+                });
+            }
+        }
+    });
+
+
 
 });
-
     </script>
 <button class="fixed-button">Сохранить путешествие</button>
+<script src="/src/adapters/entrypoints/static/rate.js"></script>
+<script src="/src/adapters/entrypoints/static/timer.js"></script>
 </body>
 </html>
