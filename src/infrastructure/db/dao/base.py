@@ -38,3 +38,21 @@ class BaseDAO:
                     await session.rollback()
                     raise e
                 return new_instance
+
+    @classmethod
+    async def update(cls, data_id: int, **values):
+        async with async_session_maker() as session:
+            async with session.begin():
+                instance = await cls.find_one_or_none_by_id(data_id)
+                if not instance:
+                    raise ValueError(f"Объект с ID {data_id} не найден")
+
+                for key, value in values.items():
+                    setattr(instance, key, value)
+
+                try:
+                    await session.commit()
+                except SQLAlchemyError as e:
+                    await session.rollback()
+                    raise e
+                return instance
