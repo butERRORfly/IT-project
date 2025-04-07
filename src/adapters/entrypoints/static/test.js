@@ -1,4 +1,4 @@
-let formCount = 1;
+let formCount = 0;
 async function convert(from, to, amount) {
   try {
     const response = await fetch(`https://api.frankfurter.dev/v1/latest?base=${from}&symbols=${to}`);
@@ -16,8 +16,6 @@ function addForm() {
     const newFormContainer = document.createElement('div');
     newFormContainer.classList.add('form-container');
     newFormContainer.id = `form-container-${formCount}`;
-
-
     const pointFormItem = document.createElement('div');
     pointFormItem.classList.add('form-item');
     pointFormItem.classList.add("name");
@@ -32,7 +30,6 @@ function addForm() {
     pointFormItem.appendChild(pointLabel);
     pointFormItem.appendChild(pointInput);
 
-
     const dateFormItem = document.createElement('div');
     dateFormItem.classList.add('form-item');
     dateFormItem.classList.add("name");
@@ -45,7 +42,6 @@ function addForm() {
     dateInput.name = `date_to-${formCount}`;
     dateFormItem.appendChild(dateLabel);
     dateFormItem.appendChild(dateInput);
-
 
     const dateFormItem1 = document.createElement('div');
     dateFormItem1.classList.add('form-item');
@@ -60,7 +56,6 @@ function addForm() {
     dateFormItem1.appendChild(dateOutLabel);
     dateFormItem1.appendChild(dateOutInput);
 
-
     const hotelFormItem = document.createElement('div');
     hotelFormItem.classList.add('form-item');
     hotelFormItem.classList.add("name");
@@ -74,7 +69,6 @@ function addForm() {
     hotelFormItem.appendChild(hotelLabel);
     hotelFormItem.appendChild(hotelInput);
 
-
     const airPortFormItem = document.createElement('div');
     airPortFormItem.classList.add('form-item');
     airPortFormItem.classList.add("name");
@@ -87,7 +81,6 @@ function addForm() {
     airPortInput.name = `air-${formCount}`;
     airPortFormItem.appendChild(airPortLabel);
     airPortFormItem.appendChild(airPortInput);
-
 
     const icaoFormItem = document.createElement('div');
     icaoFormItem.classList.add('form-item');
@@ -103,7 +96,6 @@ function addForm() {
     icaoFormItem.appendChild(icaoLabel);
     icaoFormItem.appendChild(icaoInput);
 
-
     const priceFormItem = document.createElement('div');
     priceFormItem.classList.add('form-item');
     priceFormItem.classList.add("name");
@@ -117,7 +109,6 @@ function addForm() {
     priceFormItem.appendChild(priceLabel);
     priceFormItem.appendChild(priceInput);
     priceInput.required = true;
-
 
     const rate = document.createElement('div');
     rate.classList.add('form-item');
@@ -133,6 +124,15 @@ function addForm() {
     rate.appendChild(rateInput);
     rateInput.required = true;
 
+    const delete_block = document.createElement('button');
+    delete_block.classList.add('form-item');
+    delete_block.classList.add('delete-btn');
+    delete_block.id = `deleter-${formCount}`;
+    delete_block.textContent = `Удалить точку`;
+    delete_block.addEventListener('click', (event) => {
+            delete_point(event, formCount);
+    });
+
     newFormContainer.appendChild(pointFormItem);
     newFormContainer.appendChild(dateFormItem);
     newFormContainer.appendChild(dateFormItem1);
@@ -141,18 +141,15 @@ function addForm() {
     newFormContainer.appendChild(icaoFormItem);
     newFormContainer.appendChild(priceFormItem);
     newFormContainer.appendChild(rate);
-
+    newFormContainer.appendChild(delete_block);
 
     document.getElementById('form-wrapper').insertBefore(newFormContainer, document.querySelector('.add-button'));
 }
 
-
-
 async function submitData() {
     try {
         const formsData = [];
-
-        for (let i = 1; i <= formCount; i++) {
+        for (let i = 0; i <= formCount; i++) {
             const point = document.getElementById(`point-${i}`).value;
             const date_to = document.getElementById(`date_to-${i}`).value;
             const date_out = document.getElementById(`date_out-${i}`).value;
@@ -161,9 +158,11 @@ async function submitData() {
             const icao = document.getElementById(`icao-${i}`).value;
             let cost = document.getElementById(`cost-${i}`).value;
             const rate = document.getElementById(`rate-${i}`).value;
+            const cost_for_usd = cost;
             cost = (cost+'-'+rate).toUpperCase();
-            if (rate.toUpperCase() == "USD"){
-                const convertedRate = cost;
+            console.log(rate);
+            if (rate.toUpperCase() == 'USD'){
+                const convertedRate = cost_for_usd;
                 formsData.push({ point, date_to, date_out, gost, air, icao, convertedRate, cost });
             }
             else{
@@ -197,4 +196,14 @@ async function submitData() {
         console.error('Ошибка:', error);
         alert('Ошибка сети или сервера.');
     }
+}
+function delete_point(event,id){
+    let point_to_delete = document.getElementById(`form-container-${id}`);
+    point_to_delete.remove();
+    formCount = formCount-1;
+}
+
+function rate_list(){
+
+
 }
