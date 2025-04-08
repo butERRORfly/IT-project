@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <title>Список пользователей</title>
+    <style>
+        .user-card {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        .admin-badge {
+            background-color: #ff5722;
+            color: white;
+            padding: 3px 6px;
+            border-radius: 3px;
+            font-size: 12px;
+        }
+    </style>
+
+    <h1>Список пользователей</h1>
+    <p>Вы вошли как: {{ admin.first_name }} {{ admin.last_name }} ({{ admin.email }})</p>
+
+    <div class="users-container">
+        {% for user in users %}
+        <div class="user-card">
+            <h3>{{ user.first_name }} {{ user.last_name }}</h3>
+            <p>Email: {{ user.email }}</p>
+            <p>Номер телефона: {{ user.phone_number }}</p>
+            <p>ID: {{ user.id }}</p>
+            <span class="info-label">Роль:</span>
+            <span class="info-value">
+                {% if user.is_super_admin %}Super Admin
+                {% elif user.is_admin %}Admin
+                {% else %}User{% endif %}
+            </span>
+            {% if user.is_admin %}
+            {% endif %}
+            <a href="/users/{{ user.id }}/">Подробнее</a>
+        </div>
+        {% endfor %}
+    </div>
+
+{% endblock %}
