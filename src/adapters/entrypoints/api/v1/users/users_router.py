@@ -17,11 +17,6 @@ async def profile_page(request: Request, user: User = Depends(get_current_user))
     return templates.TemplateResponse("profile.html", {"request": request, "user": user})
 
 
-# @router.get("/", summary="Получить всех пользователей")
-# async def get_all_users(user_data: User = Depends(get_current_admin_user)):
-#     return await UsersDAO.find_all()
-
-
 @router.get("/", response_class=HTMLResponse, summary="Получить всех пользователей")
 async def get_all_users_html(
         request: Request,
@@ -40,14 +35,33 @@ async def get_all_users_html(
 
 
 @router.get("/{id_user}/", summary="Получить пользователя по id")
-async def get_user_by_id(id_user: int, user_data: User = Depends(get_current_admin_user)):
+async def get_user_by_id(
+        id_user: int,
+        request: Request,
+        user_data: User = Depends(get_current_admin_user)
+):
     user = await UsersDAO.find_one_or_none_by_id(id_user)
     if not user:
         raise HTTPException(
             status_code=404,
             detail="Пользователь с указанным id не найден"
         )
-    return user
+
+    return templates.TemplateResponse(
+        "current_user.html",
+        {
+            "request": request,
+            "user": user,
+        }
+    )
+
+
+@router.patch("/{id_user}/role/{role_id}/")
+async def change_user_role(
+        id_user: int,
+        role_id: bool
+):
+    pass
 
 # @router.post("/set_role/", summary="Выдать роль")
 # async def set_admin_role(
