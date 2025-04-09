@@ -3,7 +3,7 @@ from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from src.infrastructure.db.dao.users import UsersDAO
 from src.infrastructure.db.database import User
-from src.adapters.entrypoints.webapps.dependencies import get_current_user, get_current_admin_user
+from src.adapters.entrypoints.webapps.dependencies import get_current_user, get_current_admin_user, user_is_auth
 from fastapi import Query
 from typing import Optional
 
@@ -19,8 +19,9 @@ async def profile_page(request: Request, user: User = Depends(get_current_user))
 @router.get("/", response_class=HTMLResponse, summary="Получить всех пользователей")
 async def get_all_users_html(
         request: Request,
-        role: Optional[int] = Query(None, description="Фильтр по роли (0-пользователь, 1-админ, 2-суперадмин)"),
-        admin_user: User = Depends(get_current_admin_user)
+        role: Optional[int] = Query(None, description="Фильтр по роли (0-User, 1-Admin, 2-Super Admin)"),
+        admin_user: User = Depends(get_current_admin_user),
+        user: User = Depends(user_is_auth)
 ):
     filter_params = {"role": role} if role is not None else {}
 
@@ -31,6 +32,7 @@ async def get_all_users_html(
         {
             "request": request,
             "users": users,
+            "user": user,
             "admin": admin_user,
             "current_role_filter": role
         }

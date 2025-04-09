@@ -2,7 +2,13 @@ html, body {
     height: 100%;
     margin: 0;
     line-height: 1.6;
-    font-family: 'Ubuntu', sans-serif;
+    font-family: "JetBrains Mono", monospace;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
+    display: grid;
+    grid-template-rows: auto 1fr auto; /* Шапка, контент, футер */
+    min-height: 100vh;
 }
 
 *,
@@ -26,12 +32,78 @@ h1, h2, h3, h4, h5, h6 {
     min-height: 100vh;
 }
 
-header {
-    text-align: center;
-    padding: 10px 0;
+.header {
+    width: 100%;
+    max-width: 1280px;
+    height: 110px;
+    left: 0px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 0 auto;
 }
 
+.nav_header {
+    display: flex;
+    align-items: center;
+}
 
+.nav_link_header {
+    margin: 20px;
+    font-size: 18px;
+    line-height: 21px;
+    text-align: center;
+    font-weight: 400;
+    color: rgba(0, 0, 0, 0.4);
+    text-decoration: none;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.nav_link_header:hover {
+    color: black;
+    text-decoration: none;
+}
+
+.login_box_1 {
+    width: 140px;
+    height: 45px;
+    background-color: black;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+}
+
+.login_box_down {
+    width: 170px;
+    height: 45px;
+    background-color: black;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+}
+
+.login_box_href {
+    margin: 0 auto;
+    font-weight: 700;
+    font-size: 20px;
+    line-height: 23px;
+
+    text-align: center;
+    text-decoration: none;
+    color: #FFFFFF;
+}
+
+.login_box_href:hover {
+    text-decoration: none;
+    color: #fff;
+}
+
+main {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 
 footer {
     text-align: center;
