@@ -1,11 +1,10 @@
-from fastapi import APIRouter, HTTPException, status, Response, Depends, Request
-from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi import APIRouter, HTTPException, status, Depends, Request
+from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
-from src.adapters.entrypoints.webapps.auth import get_password_hash, create_access_token, authenticate_user
 from src.infrastructure.db.dao.users import UsersDAO
 from src.infrastructure.db.database import User
-from src.domain.schemas.users import UserRegister, UserAuth, UserChangeRole
 from src.adapters.entrypoints.webapps.dependencies import get_current_user, get_current_admin_user
+from fastapi import Query
 from typing import Optional
 
 router = APIRouter()
@@ -20,16 +19,20 @@ async def profile_page(request: Request, user: User = Depends(get_current_user))
 @router.get("/", response_class=HTMLResponse, summary="Получить всех пользователей")
 async def get_all_users_html(
         request: Request,
+        role: Optional[int] = Query(None, description="Фильтр по роли (0-пользователь, 1-админ, 2-суперадмин)"),
         admin_user: User = Depends(get_current_admin_user)
 ):
-    users = await UsersDAO.find_all()
+    filter_params = {"role": role} if role is not None else {}
+
+    users = await UsersDAO.find_all(**filter_params)
 
     return templates.TemplateResponse(
         "all_users.html",
         {
             "request": request,
             "users": users,
-            "admin": admin_user
+            "admin": admin_user,
+            "current_role_filter": role
         }
     )
 
@@ -56,10 +59,26 @@ async def get_user_by_id(
     )
 
 
-@router.patch("/{id_user}/role/{role_id}/", summary="Смена роли пользователя")
+@router.delete("/{id_user}/", summary="Удалить пользователя по id")
+async def delete_user_by_id(
+        id_user: int,
+        admin: User = Depends(get_current_admin_user)
+):
+    user = await UsersDAO.find_one_or_none_by_id(id_user)
+    if not user:
+        raise HTTPException(
+            status_code=404,
+            detail="Пользователь с указанным id не найден"
+        )
+
+    delete = await UsersDAO.delete_by_id(user.id)
+    return delete
+
+
+@router.patch("/{id_user}/role/{id_role}/", summary="Смена роли пользователя")
 async def change_user_role(
         id_user: int,
-        role_id: int,
+        id_role: int,
         admin: User = Depends(get_current_admin_user)
 ):
     user = await UsersDAO.find_one_or_none_by_id(id_user)
@@ -76,13 +95,13 @@ async def change_user_role(
         )
 
     valid_roles = [0, 1, 2]
-    if role_id not in valid_roles:
+    if id_role not in valid_roles:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Недопустимый идентификатор роли. Допустимые значения: {valid_roles}"
         )
 
-    updated_user = await UsersDAO.update_role(user.id, role_id)
+    updated_user = await UsersDAO.update_role(user.id, id_role)
     if not updated_user:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -90,29 +109,3 @@ async def change_user_role(
         )
 
     return updated_user
-
-# @router.post("/set_role/", summary="Выдать роль")
-# async def set_admin_role(
-#         role_data: UserChangeRole,
-#         current_user: User = Depends(get_current_admin_user)
-# ):
-#     if not current_user.is_admin:
-#         raise HTTPException(
-#             status_code=status.HTTP_403_FORBIDDEN,
-#             detail="Только администратор может изменять роли"
-#         )
-#
-#     user = await UsersDAO.find_one_or_none(email=role_data.email)
-#     if not user:
-#         raise HTTPException(
-#             status_code=status.HTTP_404_NOT_FOUND,
-#             detail="Пользователь с указанным email не найден"
-#         )
-#
-#     await UsersDAO.update(
-#         user.id,
-#         is_admin=role_data.is_admin,
-#         is_super_admin=role_data.is_super_admin
-#     )
-#
-#     return {"message": f"Роль пользователя {role_data.email} успешно обновлена"}

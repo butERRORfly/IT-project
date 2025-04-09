@@ -1,5 +1,6 @@
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.future import select
+from sqlalchemy import delete
 from src.infrastructure.db.database import async_session_maker
 
 class BaseDAO:
@@ -51,3 +52,19 @@ class BaseDAO:
             await session.commit()
             await session.refresh(user)
             return user
+
+    @classmethod
+    async def delete_by_id(cls, user_id: int):
+        async with async_session_maker() as session:
+            async with session.begin():
+                user = await cls.find_one_or_none_by_id(user_id)
+                if not user:
+                    return False
+                await session.delete(user)
+
+            try:
+                await session.commit()
+                return True
+            except SQLAlchemyError as e:
+                await session.rollback()
+                raise e
