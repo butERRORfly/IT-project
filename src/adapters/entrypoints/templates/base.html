@@ -4,16 +4,29 @@
     <meta charset="UTF-8">
     <title>{{ title }}</title>
     <link href="{{ url_for('static', path='/base.css') }}" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="container">
-        <header>
-            <h1 class="welcome_logo">Adventures</h1>
-        </header>
+        <header class="header">
+            <nav class="nav_header">
+                <div class="nav_header_header">
+                    <a href="{{ url_for('index') }}" class="nav_link_header">Главная</a>
+                    <a href="#" class="nav_link_header">Приложение</a>
+                </div>
+            </nav>
+            {% if not user %}
+            <div class="login_box_1"><a href="{{ url_for('auth_user') }}" class="login_box_href">Войти</a></div>
+            {% else %}
+            <div class="login_box_1"><a href="{{ url_for('profile_page') }}" class="login_box_href">Профиль</a></div>
+            {% endif %}
 
+        </header>
         <main>
             {% block content %}
-            <!--Все остальные шаблоны наследуют весь код, который НЕ находится в этом блоке-->
+            <div class="logo"><h1>Adventures</h1></div>
             {% endblock %}
         </main>
 

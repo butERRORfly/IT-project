@@ -1,0 +1,204 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <title>User Profile</title>
+    <style>
+<!--        body {-->
+<!--            font-family: Arial, sans-serif;-->
+<!--            background-color: #f4f4f9;-->
+<!--            margin: 0;-->
+<!--            padding: 0;-->
+<!--            display: flex;-->
+<!--            justify-content: center;-->
+<!--            align-items: center;-->
+<!--            height: 100vh;-->
+<!--        }-->
+        .profile-container {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        h2 {
+            margin-top: 0;
+            color: #333;
+            text-align: center;
+        }
+        .user-info {
+            margin-bottom: 1.5rem;
+        }
+        .info-row {
+            display: flex;
+            margin-bottom: 0.5rem;
+        }
+        .info-label {
+            font-weight: bold;
+            width: 120px;
+            color: #555;
+        }
+        .info-value {
+            flex-grow: 1;
+        }
+        .role-form {
+            margin-top: 1.5rem;
+        }
+        .role-select {
+            width: 100%;
+            padding: 0.75rem;
+            margin-bottom: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        .role-btn {
+            display: block;
+            width: 100%;
+            padding: 0.75rem;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .role-btn:hover {
+            background-color: #0069d9;
+        }
+        .hidden {
+            display: none;
+        }
+
+        .delete-btn {
+            display: block;
+            width: 100%;
+            padding: 0.75rem;
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            text-align: center;
+            text-decoration: none;
+            margin-bottom: 10px;
+        }
+        .delete-btn:hover {
+            background-color: #c82333;
+        }
+    </style>
+
+    <div class="profile-container">
+        <h2>Профиль пользователя</h2>
+
+        <div class="user-info">
+            <div class="info-row">
+                <span class="info-label">Имя:</span>
+                <span class="info-value">{{ user.first_name }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Фамилия:</span>
+                <span class="info-value">{{ user.last_name }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Email:</span>
+                <span class="info-value">{{ user.email }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Телефон:</span>
+                <span class="info-value">{{ user.phone_number }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Текущая роль:</span>
+                <span class="info-value">
+                    {% if user.role == 2 %}Super Admin
+                    {% elif user.role == 1 %}Admin
+                    {% else %}User{% endif %}
+                </span>
+            </div>
+        </div>
+
+        <button id="showRoleForm" class="role-btn">Сменить роль</button>
+
+        <form id="deleteForm">
+            <button id="deleteButtonForm" class="delete-btn" type="submit">Удалить пользователя</button>
+        </form>
+
+        <form id="roleForm" class="role-form hidden">
+            <select name="new_role" class="role-select" required>
+                <option value="" disabled selected>Выберите новую роль</option>
+                <option value="0">User</option>
+                <option value="1">Admin</option>
+                <option value="2">Super Admin</option>
+            </select>
+            <button type="submit" class="role-btn">Подтвердить</button>
+        </form>
+
+        <script>
+            document.getElementById('showRoleForm').addEventListener('click', function() {
+                const form = document.getElementById('roleForm');
+                form.classList.toggle('hidden');
+                this.style.display = 'none';
+            });
+
+            document.getElementById('roleForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+
+                const form = e.target;
+                const newRole = form.new_role.value;
+                const userId = {{ user.id }};
+
+
+                try {
+                    const response = await fetch(`/users/${userId}/role/${newRole}/`, {
+                        method: 'PATCH',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ new_role: parseInt(newRole) })
+                    });
+
+                    if (response.ok) {
+                        alert('Роль пользователя успешно обновлена!');
+                        window.location.href = '/users/';
+                    } else {
+                        alert('Ошибка при изменении роли');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('Произошла ошибка');
+                }
+            });
+
+            document.getElementById('deleteForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+
+                const form = e.target;
+                const userId = {{ user.id }};
+
+                try {
+                    const response = await fetch(`/users/${userId}/`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                    });
+
+                    if (response.ok) {
+                        alert('Пользователь успешно удален!');
+                        window.location.href = '/users/';
+                    } else {
+                        alert('Ошибка при удалении');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('Произошла ошибка');
+                }
+            });
+        </script>
+    </div>
+{% endblock %}

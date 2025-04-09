@@ -1,5 +1,6 @@
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.future import select
+from sqlalchemy import delete
 from src.infrastructure.db.database import async_session_maker
 
 class BaseDAO:
@@ -40,19 +41,30 @@ class BaseDAO:
                 return new_instance
 
     @classmethod
-    async def update(cls, data_id: int, **values):
+    async def update_role(cls, user_id: int, new_role: int):
+        async with async_session_maker() as session:
+            user = await cls.find_one_or_none_by_id(user_id)
+            if not user:
+                return None
+
+            user.role = new_role
+            session.add(user)
+            await session.commit()
+            await session.refresh(user)
+            return user
+
+    @classmethod
+    async def delete_by_id(cls, user_id: int):
         async with async_session_maker() as session:
             async with session.begin():
-                instance = await cls.find_one_or_none_by_id(data_id)
-                if not instance:
-                    raise ValueError(f"Объект с ID {data_id} не найден")
+                user = await cls.find_one_or_none_by_id(user_id)
+                if not user:
+                    return False
+                await session.delete(user)
 
-                for key, value in values.items():
-                    setattr(instance, key, value)
-
-                try:
-                    await session.commit()
-                except SQLAlchemyError as e:
-                    await session.rollback()
-                    raise e
-                return instance
+            try:
+                await session.commit()
+                return True
+            except SQLAlchemyError as e:
+                await session.rollback()
+                raise e

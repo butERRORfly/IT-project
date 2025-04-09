@@ -6,6 +6,34 @@ from src.infrastructure.db.dao.users import UsersDAO
 from src.infrastructure.db.database import User
 
 
+async def user_is_auth(request: Request):
+    """
+    Проверяет, авторизован ли пользователь
+    Возвращает объект пользователя если авторизован, None если нет
+    """
+    try:
+        token = request.cookies.get('users_access_token')
+        if not token:
+            return None
+
+        auth_data = get_auth_data()
+        payload = jwt.decode(token, auth_data['secret_key'], algorithms=[auth_data['algorithm']])
+
+        # Проверка срока действия токена
+        expire = payload.get('exp')
+        if not expire or datetime.fromtimestamp(int(expire), tz=timezone.utc) < datetime.now(timezone.utc):
+            return None
+
+        user_id = payload.get('sub')
+        if not user_id:
+            return None
+
+        return await UsersDAO.find_one_or_none_by_id(int(user_id))
+
+    except (JWTError, ValueError):
+        return None
+
+
 def get_token(request: Request):
     """
     Достает JWT-токе из cookie-файлов
@@ -52,6 +80,6 @@ async def get_current_admin_user(current_user: User = Depends(get_current_user))
     :param current_user:
     :return:
     """
-    if current_user.is_admin:
+    if current_user.role == 2:
         return current_user
     raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Недостаточно прав!')

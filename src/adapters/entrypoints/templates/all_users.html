@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <title>Список пользователей</title>
+    <style>
+        .user-card {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        .admin-badge {
+            background-color: #ff5722;
+            color: white;
+            padding: 3px 6px;
+            border-radius: 3px;
+            font-size: 12px;
+        }
+        .filters {
+            margin-bottom: 20px;
+            border-radius: 5px;
+
+        }
+        .filters select {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        main {
+            display: block;
+        }
+    </style>
+
+    <h1>Список пользователей</h1>
+    <p>Вы вошли как: {{ admin.first_name }} {{ admin.last_name }} ({{ admin.email }})</p>
+
+    <div class="filters">
+    <form method="get" action="/users/">
+        <select name="role" onchange="this.form.submit()" id="roleSelect">
+            <option value="">Все роли</option>
+            <option value="0" {% if current_role_filter == 0 %}selected{% endif %}>User</option>
+            <option value="1" {% if current_role_filter == 1 %}selected{% endif %}>Admin</option>
+            <option value="2" {% if current_role_filter == 2 %}selected{% endif %}>Super Admin</option>
+        </select>
+    </form>
+    </div>
+
+    <div class="users-container">
+        {% for user in users %}
+        <div class="user-card">
+            <h3>{{ user.first_name }} {{ user.last_name }}</h3>
+            <p>Email: {{ user.email }}</p>
+            <p>Телефон: {{ user.phone_number }}</p>
+            <p>ID: {{ user.id }}</p>
+            <span class="info-label">Роль:</span>
+            <span class="info-value">
+                {% if user.role == 2 %}Super Admin
+                {% elif user.role == 1 %}Admin
+                {% else %}User{% endif %}
+            </span>
+            {% if user.is_admin %}
+            {% endif %}
+            <a href="/users/{{ user.id }}/">Подробнее</a>
+        </div>
+        {% endfor %}
+    </div>
+
+    <script>
+    document.getElementById('roleSelect').addEventListener('change', function() {
+        const form = document.getElementById('roleFilterForm');
+        const roleValue = this.value;
+
+        if (roleValue === "") {
+            window.location.href = "/users/";
+        } else {
+            form.submit();
+        }
+    });
+    </script>
+{% endblock %}
