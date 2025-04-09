@@ -14,7 +14,11 @@
             <nav class="nav_header">
                 <div class="nav_header_header">
                     <a href="{{ url_for('index') }}" class="nav_link_header">Главная</a>
-                    <a href="#" class="nav_link_header">Приложение</a>
+                    {% if not user %}
+                    <a href="{{ url_for('auth_user') }}" class="nav_link_header">Приложение</a>
+                    {% else %}
+                    <a href="{{ url_for('return_page') }}" class="nav_link_header">Приложение</a>
+                    {% endif %}
                 </div>
             </nav>
             {% if not user %}

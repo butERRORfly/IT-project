@@ -20,7 +20,7 @@ rout = APIRouter()
 templates = Jinja2Templates(directory="src/adapters/entrypoints/templates")
 
 
-@rout.get('/ICAO/{input_data}')
+@rout.get('/icao/{input_data}/')
 async def find_node(input_data: str):
     check = await AirDAO.find_by_icao(data=input_data)
     if check in None:
@@ -30,20 +30,14 @@ async def find_node(input_data: str):
         return check
 
 
-@rout.get("/ICAO", response_class=HTMLResponse)
-async def return_page():
-    print('[200]')
-    with open("src/adapters/entrypoints/templates/form.html", "r", encoding="utf-8") as file:
-        html_content = file.read()
-    print('[200]')
-    return HTMLResponse(content=html_content)
+@rout.get("/icao/", response_class=HTMLResponse)
+async def return_page(request: Request, user: User = Depends(get_current_user)):
+    return templates.TemplateResponse("form.html", {"request": request, "user": user})
 
 
-@rout.get('/map', response_class=HTMLResponse)
-async def f():
-    with open("src/adapters/entrypoints/templates/map.html", "r", encoding="utf-8") as file:
-        html_content = file.read()
-    return HTMLResponse(content=html_content)
+@rout.get('/map/', response_class=HTMLResponse)
+async def f(request: Request, user: User = Depends(get_current_user)):
+    return templates.TemplateResponse("map.html", {"request": request, "user": user})
 
 
 class FormData(BaseModel):
@@ -53,9 +47,10 @@ class FormData(BaseModel):
     gost: str
     air: str
     icao: str
-    convertedRate: str # переведенная валюта в USD
-    cost: str   # значение и валюта которую ввели
-    typic: str # Метод передвижения
+    convertedRate: str  # переведенная валюта в USD
+    cost: str  # значение и валюта которую ввели
+    typic: str  # Метод передвижения
+
 
 def booking_url(param: str):
     return f'https://www.booking.com/searchresults.html?ss={param}'
@@ -66,27 +61,28 @@ def calculate_date_difference(date1_str, date2_str):
         date1 = datetime.strptime(date1_str, "%Y-%m-%d")
         date2 = datetime.strptime(date2_str, "%Y-%m-%d")
         difference = (date2 - date1).days
-        if difference < 0: return 'Ошибка при вводе'
+        if difference < 0:
+            return 'Ошибка при вводе'
         else:
             return f'Расчёт дней: {difference}'
     except:
         return 'Uncorected data'
 
-@rout.post("/submit")
-async def submit_data(request: Request, forms: List[FormData]):
+
+@rout.post("/submit/")
+async def submit_data(request: Request, forms: List[FormData], user: User = Depends(get_current_user)):
     print(forms)
     req = [i.point for i in forms]
     print(req)
     req = {
-        'total_score': str(sum([float(i.convertedRate.replace('-USD','')) for i in forms])),
+        'total_score': str(sum([float(i.convertedRate.replace('-USD', '')) for i in forms])),
         'loc': [i.point for i in forms if i.point != ''],
         'date_to': [i.date_to for i in forms],
         'date_out': [i.date_out for i in forms],
         'gost': [i.gost for i in forms],
         'cost': [i.cost for i in forms],
-        'rec':[booking_url(i.point) for i in forms],
-        'wait':[calculate_date_difference(i.date_to,i.date_out) for i in forms],
-        'typic':[i.typic for i in forms]
+        'rec': [booking_url(i.point) for i in forms],
+        'wait': [calculate_date_difference(i.date_to, i.date_out) for i in forms],
+        'typic': [i.typic for i in forms]
     }
-    return templates.TemplateResponse("map.html", {"request": request, "data": req})
-
+    return templates.TemplateResponse("map.html", {"request": request, "data": req, "user": user})

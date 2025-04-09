@@ -1,11 +1,4 @@
-
-body {
-    font-family: Optima;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    margin: 0;
+main {
     background-image: url('0_fMz62Ks_u0QvVQ1E.png');
     background-size: cover;
     background-position: center center;
