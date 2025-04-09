@@ -30,8 +30,8 @@
             <p>ID: {{ user.id }}</p>
             <span class="info-label">Роль:</span>
             <span class="info-value">
-                {% if user.is_super_admin %}Super Admin
-                {% elif user.is_admin %}Admin
+                {% if user.role == 2 %}Super Admin
+                {% elif user.role == 1 %}Admin
                 {% else %}User{% endif %}
             </span>
             {% if user.is_admin %}

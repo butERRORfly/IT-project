@@ -56,12 +56,40 @@ async def get_user_by_id(
     )
 
 
-@router.patch("/{id_user}/role/{role_id}/")
+@router.patch("/{id_user}/role/{role_id}/", summary="Смена роли пользователя")
 async def change_user_role(
         id_user: int,
-        role_id: bool
+        role_id: int,
+        admin: User = Depends(get_current_admin_user)
 ):
-    pass
+    user = await UsersDAO.find_one_or_none_by_id(id_user)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Пользователь не найден"
+        )
+
+    if user.id == admin.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Нельзя изменить свою собственную роль"
+        )
+
+    valid_roles = [0, 1, 2]
+    if role_id not in valid_roles:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Недопустимый идентификатор роли. Допустимые значения: {valid_roles}"
+        )
+
+    updated_user = await UsersDAO.update_role(user.id, role_id)
+    if not updated_user:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Не удалось обновить роль пользователя"
+        )
+
+    return updated_user
 
 # @router.post("/set_role/", summary="Выдать роль")
 # async def set_admin_role(

@@ -54,22 +54,40 @@
             font-size: 1rem;
             text-align: center;
             text-decoration: none;
+            margin-bottom: 10px;
         }
         .logout-btn:hover {
             background-color: #c82333;
         }
+
+        .role-btn {
+            display: block;
+            width: 100%;
+            padding: 0.75rem;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .role-btn:hover {
+            background-color: #0069d9;
+        }
     </style>
 
     <div class="profile-container">
-        <h2>User Profile</h2>
+        <h2>Профиль пользователя</h2>
 
         <div class="user-info">
             <div class="info-row">
-                <span class="info-label">First Name:</span>
+                <span class="info-label">Имя:</span>
                 <span class="info-value">{{ user.first_name }}</span>
             </div>
             <div class="info-row">
-                <span class="info-label">Last Name:</span>
+                <span class="info-label">Фамилия:</span>
                 <span class="info-value">{{ user.last_name }}</span>
             </div>
             <div class="info-row">
@@ -77,22 +95,29 @@
                 <span class="info-value">{{ user.email }}</span>
             </div>
             <div class="info-row">
-                <span class="info-label">Phone:</span>
+                <span class="info-label">Телефон:</span>
                 <span class="info-value">{{ user.phone_number }}</span>
             </div>
             <div class="info-row">
-                <span class="info-label">Role:</span>
+                <span class="info-label">Роль:</span>
                 <span class="info-value">
-                    {% if user.is_super_admin %}Super Admin
-                    {% elif user.is_admin %}Admin
+                    {% if user.role == 2 %}Super Admin
+                    {% elif user.role == 1 %}Admin
                     {% else %}User{% endif %}
                 </span>
             </div>
         </div>
 
-        <form action="/auth/logout" method="post" class="logout-form">
-            <button type="submit" class="logout-btn">Logout</button>
+        {% if user.role == 2 %}
+        <form action="/users/" class="logout-form">
+            <button type="submit" class="role-btn">Админ панель</button>
         </form>
+        {% endif %}
+
+        <form action="/auth/logout" method="post" class="logout-form">
+            <button type="submit" class="logout-btn">Выйти</button>
+        </form>
+
 
     </div>
 {% endblock %}

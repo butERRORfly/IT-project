@@ -42,26 +42,39 @@
         .info-value {
             flex-grow: 1;
         }
-        .logout-btn {
+        .role-form {
+            margin-top: 1.5rem;
+        }
+        .role-select {
+            width: 100%;
+            padding: 0.75rem;
+            margin-bottom: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        .role-btn {
             display: block;
             width: 100%;
             padding: 0.75rem;
-            background-color: #dc3545;
+            background-color: #007bff;
             color: white;
             border: none;
             border-radius: 4px;
             cursor: pointer;
             font-size: 1rem;
             text-align: center;
-            text-decoration: none;
         }
-        .logout-btn:hover {
-            background-color: #c82333;
+        .role-btn:hover {
+            background-color: #0069d9;
+        }
+        .hidden {
+            display: none;
         }
     </style>
 
     <div class="profile-container">
-        <h2></h2>
+        <h2>Профиль пользователя</h2>
 
         <div class="user-info">
             <div class="info-row">
@@ -81,18 +94,61 @@
                 <span class="info-value">{{ user.phone_number }}</span>
             </div>
             <div class="info-row">
-                <span class="info-label">Роль:</span>
+                <span class="info-label">Текущая роль:</span>
                 <span class="info-value">
-                    {% if user.is_super_admin %}Super Admin
-                    {% elif user.is_admin %}Admin
+                    {% if user.role == 2 %}Super Admin
+                    {% elif user.role == 1 %}Admin
                     {% else %}User{% endif %}
                 </span>
             </div>
         </div>
 
-        <form action="#" method="post" class="logout-form">
-            <button type="submit" class="logout-btn">Сменить роль</button>
-        </form>
+        <button id="showRoleForm" class="role-btn">Сменить роль</button>
 
-    </div>
+    <form id="roleForm" class="role-form hidden">
+        <select name="new_role" class="role-select" required>
+            <option value="" disabled selected>Выберите новую роль</option>
+            <option value="0">User</option>
+            <option value="1">Admin</option>
+            <option value="2">Super Admin</option>
+        </select>
+        <button type="submit" class="role-btn">Подтвердить</button>
+    </form>
+
+    <script>
+        document.getElementById('showRoleForm').addEventListener('click', function() {
+            const form = document.getElementById('roleForm');
+            form.classList.toggle('hidden');
+            this.style.display = 'none';
+        });
+
+        document.getElementById('roleForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const form = e.target;
+            const newRole = form.new_role.value;
+            const userId = {{ user.id }};
+
+
+            try {
+                const response = await fetch(`/users/${userId}/role/${newRole}/`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ new_role: parseInt(newRole) })
+                });
+
+                if (response.ok) {
+                    alert('Роль пользователя успешно обновлена!');
+                    window.location.href = '/users/';
+                } else {
+                    alert('Ошибка при изменении роли');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Произошла ошибка');
+            }
+        });
+    </script>
 {% endblock %}

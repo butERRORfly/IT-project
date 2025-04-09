@@ -102,7 +102,7 @@
                 });
 
                 if (response.ok) {
-                    window.location.href = '/ICAO';
+                    window.location.href = '/users/profile/';
                 } else {
                     const data = await response.json();
                     document.getElementById('errorMessage').textContent = data.detail || 'Login failed';

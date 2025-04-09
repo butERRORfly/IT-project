@@ -52,6 +52,6 @@ async def get_current_admin_user(current_user: User = Depends(get_current_user))
     :param current_user:
     :return:
     """
-    if current_user.is_admin:
+    if current_user.role == 2:
         return current_user
     raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Недостаточно прав!')
