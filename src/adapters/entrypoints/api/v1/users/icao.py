@@ -53,23 +53,24 @@ class FormData(BaseModel):
     gost: str
     air: str
     icao: str
-    convertedRate: str  # переведенная валюта в USD
-    cost: str  # значение и валюта которую ввели
-
+    convertedRate: str # переведенная валюта в USD
+    cost: str   # значение и валюта которую ввели
+    typic: str # Метод передвижения
 
 def booking_url(param: str):
     return f'https://www.booking.com/searchresults.html?ss={param}'
 
 
 def calculate_date_difference(date1_str, date2_str):
-    date1 = datetime.strptime(date1_str, "%Y-%m-%d")
-    date2 = datetime.strptime(date2_str, "%Y-%m-%d")
-    difference = (date2 - date1).days
-    if difference < 0:
-        return 'Ошибка при вводе'
-    else:
-        return f'Расчёт дней: {difference}'
-
+    try:
+        date1 = datetime.strptime(date1_str, "%Y-%m-%d")
+        date2 = datetime.strptime(date2_str, "%Y-%m-%d")
+        difference = (date2 - date1).days
+        if difference < 0: return 'Ошибка при вводе'
+        else:
+            return f'Расчёт дней: {difference}'
+    except:
+        return 'Uncorected data'
 
 @rout.post("/submit")
 async def submit_data(request: Request, forms: List[FormData]):
@@ -77,13 +78,15 @@ async def submit_data(request: Request, forms: List[FormData]):
     req = [i.point for i in forms]
     print(req)
     req = {
-        'total_score': str(sum([float(i.convertedRate.replace('-USD', '')) for i in forms])),
+        'total_score': str(sum([float(i.convertedRate.replace('-USD','')) for i in forms])),
         'loc': [i.point for i in forms if i.point != ''],
         'date_to': [i.date_to for i in forms],
         'date_out': [i.date_out for i in forms],
         'gost': [i.gost for i in forms],
         'cost': [i.cost for i in forms],
-        'rec': [booking_url(i.point) for i in forms],
-        'wait': [calculate_date_difference(i.date_to, i.date_out) for i in forms]
+        'rec':[booking_url(i.point) for i in forms],
+        'wait':[calculate_date_difference(i.date_to,i.date_out) for i in forms],
+        'typic':[i.typic for i in forms]
     }
     return templates.TemplateResponse("map.html", {"request": request, "data": req})
+
