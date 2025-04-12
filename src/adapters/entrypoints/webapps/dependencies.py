@@ -3,12 +3,12 @@ from jose import jwt, JWTError
 from datetime import datetime, timezone
 from src.configurator.config import get_auth_data
 from src.infrastructure.db.dao.users import UsersDAO
-from src.infrastructure.db.database import User
+from src.infrastructure.db.database import UserDB
 
 
 async def user_is_auth(request: Request):
     """
-    Проверяет, авторизован ли пользователь
+    Проверяет, авторизован ли пользователь.
     Возвращает объект пользователя если авторизован, None если нет
     """
     try:
@@ -69,12 +69,12 @@ async def get_current_user(token: str = Depends(get_token)):
 
     user = await UsersDAO.find_one_or_none_by_id(int(user_id))
     if not user:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='User not found')
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='UserDB not found')
 
     return user
 
 
-async def get_current_admin_user(current_user: User = Depends(get_current_user)):
+async def get_current_admin_user(current_user: UserDB = Depends(get_current_user)):
     """
     Является ли текущий пользователь администратором
     :param current_user:
