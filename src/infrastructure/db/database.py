@@ -38,10 +38,6 @@ class User(Base):
     email: Mapped[str_uniq]
     password: Mapped[str]
 
-    # is_user: Mapped[bool] = mapped_column(default=True, server_default=text('true'), nullable=False)
-    # is_admin: Mapped[bool] = mapped_column(default=False, server_default=text('false'), nullable=False)
-    # is_super_admin: Mapped[bool] = mapped_column(default=False, server_default=text('false'), nullable=False)
-
     role: Mapped[role_type]
 
     extend_existing = True
