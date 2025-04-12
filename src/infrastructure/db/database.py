@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, Asyn
 from sqlalchemy.orm import DeclarativeBase, declared_attr, Mapped, mapped_column
 from sqlalchemy import text, Integer
 from src.configurator.config import get_db_url
-from src.domain.models.user import UserD
+from src.domain.models.user import User
 
 DATABASE_URL = get_db_url()
 
@@ -31,7 +31,7 @@ class Base(AsyncAttrs, DeclarativeBase):
     updated_at: Mapped[updated_at]
 
 
-class User(Base, UserD):
+class UserDB(Base):
     id: Mapped[int_pk]
     phone_number: Mapped[str_uniq]
     first_name: Mapped[str]
