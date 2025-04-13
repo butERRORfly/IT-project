@@ -19,6 +19,7 @@ str_uniq = Annotated[str, mapped_column(unique=True, nullable=False)]
 str_null_true = Annotated[str, mapped_column(nullable=True)]
 role_type = Annotated[int, mapped_column(Integer, default=0, server_default=text('0'), nullable=False)]
 
+
 class Base(AsyncAttrs, DeclarativeBase):
     __abstract__ = True
 
@@ -37,10 +38,7 @@ class User(Base):
     last_name: Mapped[str]
     email: Mapped[str_uniq]
     password: Mapped[str]
-
     role: Mapped[role_type]
-
-    extend_existing = True
 
     def __repr__(self):
         return f"{self.__class__.__name__}(id={self.id})"
