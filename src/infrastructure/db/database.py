@@ -6,7 +6,6 @@ from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, Asyn
 from sqlalchemy.orm import DeclarativeBase, declared_attr, Mapped, mapped_column
 from sqlalchemy import text, Integer
 from src.configurator.config import get_db_url
-from src.domain.models.user import User
 
 DATABASE_URL = get_db_url()
 
@@ -31,14 +30,21 @@ class Base(AsyncAttrs, DeclarativeBase):
     updated_at: Mapped[updated_at]
 
 
-class UserDB(Base):
+class User(Base):
     id: Mapped[int_pk]
     phone_number: Mapped[str_uniq]
     first_name: Mapped[str]
     last_name: Mapped[str]
     email: Mapped[str_uniq]
     password: Mapped[str]
+
+    # is_user: Mapped[bool] = mapped_column(default=True, server_default=text('true'), nullable=False)
+    # is_admin: Mapped[bool] = mapped_column(default=False, server_default=text('false'), nullable=False)
+    # is_super_admin: Mapped[bool] = mapped_column(default=False, server_default=text('false'), nullable=False)
+
     role: Mapped[role_type]
+
+    extend_existing = True
 
     def __repr__(self):
         return f"{self.__class__.__name__}(id={self.id})"
