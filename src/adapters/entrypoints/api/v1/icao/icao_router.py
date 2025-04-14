@@ -7,7 +7,7 @@ from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi import FastAPI, Form
 from typing import List
 from fastapi.templating import Jinja2Templates
-from src.infrastructure.db.database import UserDB
+from src.infrastructure.db.database import User
 from src.domain.schemas.users import UserRegister, UserAuth, UserChangeRole
 from src.adapters.entrypoints.webapps.dependencies import get_current_user, get_current_admin_user
 from pydantic import BaseModel
@@ -31,12 +31,12 @@ async def find_node(input_data: str):
 
 
 @rout.get("/icao/", response_class=HTMLResponse)
-async def return_page(request: Request, user: UserDB = Depends(get_current_user)):
+async def return_page(request: Request, user: User = Depends(get_current_user)):
     return templates.TemplateResponse("form.html", {"request": request, "user": user})
 
 
 @rout.get('/map/', response_class=HTMLResponse)
-async def f(request: Request, user: UserDB = Depends(get_current_user)):
+async def f(request: Request, user: User = Depends(get_current_user)):
     return templates.TemplateResponse("map.html", {"request": request, "user": user})
 
 
@@ -70,7 +70,7 @@ def calculate_date_difference(date1_str, date2_str):
 
 
 @rout.post("/submit/")
-async def submit_data(request: Request, forms: List[FormData], user: UserDB = Depends(get_current_user)):
+async def submit_data(request: Request, forms: List[FormData], user: User = Depends(get_current_user)):
     print(forms)
     req = [i.point for i in forms]
     print(req)

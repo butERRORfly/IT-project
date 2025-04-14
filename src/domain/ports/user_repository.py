@@ -1,21 +1,21 @@
 from abc import ABC, abstractmethod
 from typing import List
 
-from src.domain.models.user import User
+from src.domain.models.user import UserD
 
 class UserRepository(ABC):
     model = None
 
     @abstractmethod
-    def find_all(self, **kwargs) -> List[User]:
+    def find_all(self, **kwargs) -> List[UserD]:
         pass
 
     @abstractmethod
-    def add(self, **kwargs) -> User:
+    def add(self, **kwargs) -> UserD:
         pass
 
     @abstractmethod
-    def find_one_or_none(self, **kwargs) -> User | None:
+    def find_one_or_none(self, **kwargs) -> UserD | None:
         pass
 
     @abstractmethod
@@ -23,7 +23,7 @@ class UserRepository(ABC):
         pass
 
     @abstractmethod
-    def update_role(self, user_id: int, new_role: int) -> User:
+    def update_role(self, user_id: int, new_role: int) -> UserD:
         pass
 
     @abstractmethod

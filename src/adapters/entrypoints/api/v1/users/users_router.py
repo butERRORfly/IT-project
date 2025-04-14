@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, status, Depends, Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from src.infrastructure.db.dao.users import UsersDAO
-from src.infrastructure.db.database import UserDB
+from src.infrastructure.db.database import User
 from src.adapters.entrypoints.webapps.dependencies import get_current_user, get_current_admin_user, user_is_auth
 from fastapi import Query
 from typing import Optional
@@ -12,16 +12,16 @@ templates = Jinja2Templates(directory="src/adapters/entrypoints/templates")
 
 
 @router.get("/profile/", response_class=HTMLResponse, summary="Профиль пользователя")
-async def profile_page(request: Request, user: UserDB = Depends(get_current_user)):
+async def profile_page(request: Request, user: User = Depends(get_current_user)):
     return templates.TemplateResponse("profile.html", {"request": request, "user": user})
 
 
 @router.get("/", response_class=HTMLResponse, summary="Получить всех пользователей")
 async def get_all_users_html(
         request: Request,
-        role: Optional[int] = Query(None, description="Фильтр по роли (0-UserDB, 1-Admin, 2-Super Admin)"),
-        admin_user: UserDB = Depends(get_current_admin_user),
-        user: UserDB = Depends(user_is_auth)
+        role: Optional[int] = Query(None, description="Фильтр по роли (0-User, 1-Admin, 2-Super Admin)"),
+        admin_user: User = Depends(get_current_admin_user),
+        user: User = Depends(user_is_auth)
 ):
     filter_params = {"role": role} if role is not None else {}
 
@@ -43,7 +43,7 @@ async def get_all_users_html(
 async def get_user_by_id(
         id_user: int,
         request: Request,
-        user_data: UserDB = Depends(get_current_admin_user)
+        user_data: User = Depends(get_current_admin_user)
 ):
     user = await UsersDAO.find_one_or_none_by_id(id_user)
     if not user:
@@ -64,7 +64,7 @@ async def get_user_by_id(
 @router.delete("/{id_user}/", summary="Удалить пользователя по id")
 async def delete_user_by_id(
         id_user: int,
-        admin: UserDB = Depends(get_current_admin_user)
+        admin: User = Depends(get_current_admin_user)
 ):
     user = await UsersDAO.find_one_or_none_by_id(id_user)
     if not user:
@@ -81,7 +81,7 @@ async def delete_user_by_id(
 async def change_user_role(
         id_user: int,
         id_role: int,
-        admin: UserDB = Depends(get_current_admin_user)
+        admin: User = Depends(get_current_admin_user)
 ):
     user = await UsersDAO.find_one_or_none_by_id(id_user)
     if not user:
