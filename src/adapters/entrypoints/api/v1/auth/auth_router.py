@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, status, Response, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
-from src.adapters.entrypoints.webapps.auth import get_password_hash, create_access_token, authenticate_user
+from src.adapters.entrypoints.utilities.auth import get_password_hash, create_access_token, authenticate_user
 from src.infrastructure.db.dao.users import UsersDAO
 from src.domain.schemas.users import UserRegister, UserAuth
 

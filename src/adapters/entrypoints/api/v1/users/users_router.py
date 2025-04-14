@@ -3,7 +3,7 @@ from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from src.infrastructure.db.dao.users import UsersDAO
 from src.infrastructure.db.database import User
-from src.adapters.entrypoints.webapps.dependencies import get_current_user, get_current_admin_user, user_is_auth
+from src.adapters.entrypoints.utilities.dependencies import get_current_user, get_current_admin_user, user_is_auth
 from fastapi import Query
 from typing import Optional
 

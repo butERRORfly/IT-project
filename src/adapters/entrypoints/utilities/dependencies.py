@@ -8,7 +8,7 @@ from src.infrastructure.db.database import User
 
 async def user_is_auth(request: Request):
     """
-    Проверяет, авторизован ли пользователь
+    Проверяет, авторизован ли пользователь.
     Возвращает объект пользователя если авторизован, None если нет
     """
     try:

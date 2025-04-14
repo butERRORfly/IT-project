@@ -2,14 +2,14 @@ from fastapi import APIRouter, HTTPException, status, Response, Depends
 from starlette.requests import Request
 from starlette.responses import RedirectResponse
 
-from src.adapters.entrypoints.webapps.auth import get_password_hash, create_access_token, authenticate_user
+from src.adapters.entrypoints.utilities.auth import get_password_hash, create_access_token, authenticate_user
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi import FastAPI, Form
 from typing import List
 from fastapi.templating import Jinja2Templates
 from src.infrastructure.db.database import User
 from src.domain.schemas.users import UserRegister, UserAuth, UserChangeRole
-from src.adapters.entrypoints.webapps.dependencies import get_current_user, get_current_admin_user
+from src.adapters.entrypoints.utilities.dependencies import get_current_user, get_current_admin_user
 from pydantic import BaseModel
 import requests
 from datetime import datetime
