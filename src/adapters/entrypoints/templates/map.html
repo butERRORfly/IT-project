@@ -1,7 +1,4 @@
-{% extends 'base.html' %}
 
-
-{% block content %}
 
 <link rel="stylesheet" href="/src/adapters/entrypoints/static/icao/map.css">
 <script type="text/javascript" src="https://api-maps.yandex.ru/2.1/?apikey=6a4c745a-8968-455d-8801-aef21ebfa91b&lang=ru_RU"></script>
@@ -9,17 +6,34 @@
 <div class="map-container">
     <div id="map"></div>
     <div id="map"></div>
-    <div class="sidebar">
+    <div class="sidebar" id = 's'>
         {% for i in range(data["loc"] | length) %}
         <div class="point" id="point-{{ i }}">
             <p>Точка посещения: {{ data["loc"][i] }}</p>
+            {% if data["date_to"][i] != '!' %}
             <p>Дата прибытия: {{ data["date_to"][i] }} </p>
+            {% endif %}
+
+
             <p>Дата отбытия: {{ data["date_out"][i] }}</p>
+            <p>Аэропрт вылета: {{ data["air"][i] }}</p>
+            <p>Icao код: {{ data["icao"][i] }}</p>
+
+            {% if data["air2"][i] != '!' %}
+            <p>Аэропорт прилета: {{ data["air2"][i] }} </p>
+            {% endif %}
+
+            {% if data["icao2"][i] != '!' %}
+            <p>Icao код: {{ data["icao2"][i] }} </p>
+            {% endif %}
+
             <p>Гостиница: {{ data["gost"][i] }}</p>
+            {% if i != 0%}
             <p>{{ data["wait"][i]}}</p>
+            {% endif %}
             <p> {{data["cost"][i]}}</p>
             <p class="rater-{{ i }}" id="rater-{{ i }}">Loading time in point...</p>
-            <p>Способ передвижения - {{data["typic"][i]}}</p>
+            <p>Транспорт отправления: {{data["typic"][i]}}</p>
         </div>
         <div class="point">
         </div>
@@ -33,12 +47,15 @@
         </p>
         <select id="selector"></select>
     </div>
+    <button id ='add_button' class = 'point'> Добавить точку</button>
 
 </div>
 <script>
+
     function delay(ms) {
         return new Promise(resolve => setTimeout(resolve, ms));
     }
+    console.log({{ data["loc"] | safe }});
 
     function spliter(time){
         return time.split(' ')[1];
@@ -65,11 +82,107 @@
             controls: ["zoomControl", "searchControl"]
         });
 
+
+
+function blocker(adr){
+  const new_point = document.createElement('div');
+  new_point.classList.add('point');
+  new_point.id = 'myUniqueId';
+  new_point.innerHTML = `
+    <p id = 'test1'> Точка посещения: "${adr}"
+    </p>
+    <p id='test2'>
+      Дата прибытия:
+      <input type="date">
+    </p>
+    <p id='test3'>
+      Дата отбытия:
+      <input type="date">
+    </p>
+    <p id ='test4'>
+      Гостиница:
+      <input >
+    </p>
+    <p id = 'test5'>
+      Планируемый бюджет:
+      <input type="number" >
+    </p>
+    <p id = 'test6'>
+    Валюта:
+    <select id = 'currencies'>
+     <option value="usd">USD</option>
+    </select>
+    </p>
+    <p id ='test7'>
+      Способ передвижения:
+    </label>
+    <p>
+    <select  class="selector" >
+      <option value="poliline" selected>poliline</option>
+      <option value="car">car</option>
+    </select>
+    </p>
+    <button type="submit" id = 'save_button'>Редактировать</button>
+  `;
+  const to = document.getElementById('s');
+  to.appendChild(new_point);
+  document.getElementById('add_button').disabled = false;
+  document.getElementById('save_button').addEventListener('click', function(e){
+    e.target.remove();
+    const form = document.getElementById('myUniqueId');
+    console.log('ass');
+    form.id = `point-${count}`;
+    const paragraphs = form.querySelectorAll('p');
+    paragraphs.forEach(p => {
+      const input = p.querySelector('input, select');
+      if (input) {
+        const labelText = p.firstChild.nodeValue?.trim();
+        let valueText = '';
+        if (input.tagName === 'SELECT') {
+          valueText = input.options[input.selectedIndex].text ;
+        } else {
+          valueText = input.value;
+        }
+        p.textContent = `${labelText} ${valueText}`;
+      }
+    });
+  });
+}
+
+
+function onMapClick(e) {
+   let cur = e.get('coords');
+   console.log(coordinates[-1]);
+   console.log(cur);
+   count = coordinates.length;
+   map.events.remove('click', onMapClick);
+   ymaps.geocode(cur).then(function (res) {
+        createCarRoute(coordinates[coordinates.length - 1],cur);
+        coordinates.push(cur);
+        let first = res.geoObjects.get(0);
+        let adr = first.getAddressLine();
+        let marker = new ymaps.Placemark(cur, {
+            balloonContent: 'Новая точка',
+            iconContent: ''
+            });
+        map.geoObjects.add(marker);
+        blocker(adr);
+   });
+ }
+
+
+document.getElementById('add_button').addEventListener('click', function () {
+  this.disabled = true;
+  map.events.add('click', onMapClick);
+  console.log('button was found');
+  });
+
         var locations = {{ data["loc"] | safe }}; // Список местоположений
         var connectionTypes = {{ data["typic"] | safe }}; // Список типов связи (car или poliline)
         connectionTypes.pop(); // удалили последний ненужный тип передвижения
         var coordinates = [];
         var validator = [];
+        let count;
 
         function geocodeLocation(location) {
             return new Promise(function(resolve, reject) {
@@ -176,6 +289,7 @@
             }
         }
         promiseChain.then(async function() {
+
             for (let i = 0; i < validator.length; i++){
                 await new Promise(resolve => setTimeout(resolve, 2000));
                 if (validator[i] == 0){
@@ -202,4 +316,4 @@
 <script src="/src/adapters/entrypoints/static/icao/rate.js"></script>
 <script src="/src/adapters/entrypoints/static/icao/timer.js"></script>
 
-{% endblock %}
+
