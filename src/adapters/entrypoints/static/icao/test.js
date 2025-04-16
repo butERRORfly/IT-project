@@ -36,7 +36,7 @@ function addForm() {
     block.classList.add('form-item');
     block.classList.add("name");
     const wayLabel = document.createElement('label');
-    wayLabel.textContent = 'Транспорт';
+    wayLabel.textContent = 'Транспорт отправления';
     const typeWay = document.createElement('select');
     typeWay.classList.add('selector');
     wayLabel.classList.add('name');
@@ -102,7 +102,7 @@ function addForm() {
     airPortFormItem.classList.add("name");
     const airPortLabel = document.createElement('label');
     airPortLabel.setAttribute('for', `air-${formCount}`);
-    airPortLabel.textContent = `Аэропорт ${formCount}:`;
+    airPortLabel.textContent = `Аэропорт прилета:`;
     const airPortInput = document.createElement('input');
     airPortInput.type = 'text';
     airPortInput.id = `air-${formCount}`;
@@ -116,7 +116,7 @@ function addForm() {
     icaoFormItem.classList.add("form");
     const icaoLabel = document.createElement('label');
     icaoLabel.setAttribute('for', `icao-${formCount}`);
-    icaoLabel.textContent = `ICAO код ${formCount}:`;
+    icaoLabel.textContent = `ICAO код `;
     const icaoInput = document.createElement('input');
     icaoInput.type = 'text';
     icaoInput.id = `icao-${formCount}`;
@@ -124,13 +124,44 @@ function addForm() {
     icaoFormItem.appendChild(icaoLabel);
     icaoFormItem.appendChild(icaoInput);
 
+    const airPortFormItem2 = document.createElement('div');
+    airPortFormItem2.classList.add('form-item');
+    airPortFormItem2.classList.add('form');
+    airPortFormItem2.classList.add("name");
+    const airPortLabel2 = document.createElement('label');
+    airPortLabel2.setAttribute('for', `air-${formCount}`);
+    airPortLabel2.textContent = `Аэропорт вылета:`;
+    const airPortInput2 = document.createElement('input');
+    airPortInput2.type = 'text';
+    airPortInput2.id = `air2-${formCount}`;
+    airPortInput2.name = `air2-${formCount}`;
+    airPortFormItem2.appendChild(airPortLabel2);
+    airPortFormItem2.appendChild(airPortInput2);
+
+
+
+    const icaoFormItem2 = document.createElement('div');
+    icaoFormItem2.classList.add('form-item');
+    icaoFormItem2.classList.add("name");
+    icaoFormItem2.classList.add("form");
+    const icaoLabel2 = document.createElement('label');
+    icaoLabel2.setAttribute('for', `icao-${formCount}`);
+    icaoLabel2.textContent = `ICAO `;
+    const icaoInput2 = document.createElement('input');
+    icaoInput2.type = 'text';
+    icaoInput2.id = `icao2-${formCount}`;
+    icaoInput2.name = `icao2-${formCount}`;
+    icaoFormItem2.appendChild(icaoLabel2);
+    icaoFormItem2.appendChild(icaoInput2);
+
+
     const priceFormItem = document.createElement('div');
     priceFormItem.classList.add('form-item');
     priceFormItem.classList.add('form');
     priceFormItem.classList.add("name");
     const priceLabel = document.createElement('label');
     priceLabel.setAttribute('for', `cost-${formCount}`);
-    priceLabel.textContent = `Цена посещения за точку ${formCount}:`;
+    priceLabel.textContent = `Цена посещения за точку `;
     const priceInput = document.createElement('input');
     priceInput.type = 'number';
     priceInput.id = `cost-${formCount}`;
@@ -145,7 +176,7 @@ function addForm() {
     rate.classList.add("name");
     const rateLabel = document.createElement('label');
     rateLabel.setAttribute('for', `rate-${formCount}`);
-    rateLabel.textContent = `Расчетная валюта ${formCount}:`;
+    rateLabel.textContent = `Расчетная валюта `;
     const VAL = document.createElement('select');
     VAL.classList.add('selector');
     VAL.id = `rate-${formCount}`;
@@ -171,6 +202,8 @@ function addForm() {
     newFormContainer.appendChild(hotelFormItem);
     newFormContainer.appendChild(airPortFormItem);
     newFormContainer.appendChild(icaoFormItem);
+    newFormContainer.appendChild(airPortFormItem2);
+    newFormContainer.appendChild(icaoFormItem2);
     newFormContainer.appendChild(priceFormItem);
     newFormContainer.appendChild(rate);
     newFormContainer.appendChild(delete_block);
@@ -184,11 +217,20 @@ async function submitData() {
         const formsData = [];
         for (let i = 0; i <= formCount; i++) {
             const point = document.getElementById(`point-${i}`).value;
-            const date_to = document.getElementById(`date_to-${i}`).value;
+            const dateElement = document.getElementById(`date_to-${i}`);
+            const date_to = dateElement ? dateElement.value : '!';
+
             const date_out = document.getElementById(`date_out-${i}`).value;
             const gost = document.getElementById(`gost-${i}`).value;
             const air = document.getElementById(`air-${i}`).value;
             const icao = document.getElementById(`icao-${i}`).value;
+
+            const icao2Element = document.getElementById(`icao2-${i}`);
+            const icao2 = icao2Element ? icao2Element.value : '!';
+
+            const air2Element = document.getElementById(`air2-${i}`);
+            const air2 = air2Element ? air2Element.value : '!';
+
             const typic = document.getElementById(`type_way-${i}`).value;
             let cost = document.getElementById(`cost-${i}`).value;
             const rate = document.getElementById(`rate-${i}`).value;
@@ -197,12 +239,12 @@ async function submitData() {
             console.log(rate);
             if (rate.toUpperCase() == 'USD'){
                 const convertedRate = cost_for_usd;
-                formsData.push({ point, date_to, date_out, gost, air, icao, convertedRate, cost, typic});
+                formsData.push({ point, date_to, date_out, gost, air, icao, air2, icao2, convertedRate, cost, typic});
             }
             else{
                 const convertedRate = await convert(rate.toUpperCase(), 'USD', parseInt(cost));
                 console.log(convertedRate);
-                formsData.push({ point, date_to, date_out, gost, air, icao, convertedRate, cost, typic });
+                formsData.push({ point, date_to, date_out, gost, air, icao, air2, icao2, convertedRate, cost, typic });
             }
         }
 
@@ -280,4 +322,19 @@ function add_cur(){
   }
   select.value = "USD";
 }
+
+
+function valid(value) {
+    return /^[1-9]\d*$/.test(value);
+  }
+document.addEventListener('input', function(event) {
+    const target = event.target;
+    if (target.tagName === 'INPUT' && /^cost-\d+$/.test(target.id)) {
+      if (!valid(target.value)) {
+        target.value = '';
+      }
+    }
+});
+
+
 add_cur()
