@@ -47,6 +47,8 @@ class FormData(BaseModel):
     gost: str
     air: str
     icao: str
+    air2: str
+    icao2: str
     convertedRate: str  # переведенная валюта в USD
     cost: str  # значение и валюта которую ввели
     typic: str  # Метод передвижения
@@ -81,8 +83,11 @@ async def submit_data(request: Request, forms: List[FormData], user: User = Depe
         'date_out': [i.date_out for i in forms],
         'gost': [i.gost for i in forms],
         'cost': [i.cost for i in forms],
-        'rec': [booking_url(i.point) for i in forms],
         'wait': [calculate_date_difference(i.date_to, i.date_out) for i in forms],
-        'typic': [i.typic for i in forms]
+        'typic': [i.typic for i in forms],
+        'air':[i.air for i in forms],
+        'air2':[i.air2 for i in forms],
+        'icao':[i.icao for i in forms],
+        'icao2':[i.icao2 for i in forms]
     }
     return templates.TemplateResponse("map.html", {"request": request, "data": req, "user": user})
