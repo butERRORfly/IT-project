@@ -10,8 +10,8 @@ async function convert(from, to, amount) {
   }
 }
 
-async function change_rate(){
-  const currencies = [
+
+const currencies = [
   { "code": "AUD", "name": "Australian Dollar" },
   { "code": "BGN", "name": "Bulgarian Lev" },
   { "code": "BRL", "name": "Brazilian Real" },
@@ -43,7 +43,11 @@ async function change_rate(){
   { "code": "TRY", "name": "Turkish Lira" },
   { "code": "USD", "name": "United States Dollar" },
   { "code": "ZAR", "name": "South African Rand" }
-  ];
+];
+
+
+
+async function change_rate(){
   const select = document.getElementById('selector');
   for (let i = 0; i < currencies.length; i++) {
     const option = document.createElement('option');
@@ -80,3 +84,16 @@ flag_change.addEventListener('change', function(e) {
        });
    }
 });
+
+function create(){
+    const select = document.getElementById('currencies');
+    for (let i = 0; i < currencies.length; i++) {
+    const option = document.createElement('option');
+    option.value = currencies[i].code;
+    option.textContent = currencies[i].name;
+    select.appendChild(option);
+    }
+    select.value = "USD";
+}
+
+
