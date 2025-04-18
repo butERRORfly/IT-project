@@ -54,8 +54,8 @@
             <p>ID: {{ user.id }}</p>
             <span class="info-label">Роль:</span>
             <span class="info-value">
-                {% if user.role_id == 2 %}Admin
-                {% else %}User
+                {% if user.role.id == 2 %}Admin
+                {% elif user.role.id == 1 %}User
                 {% endif %}
             </span>
             <a href="/users/{{ user.id }}/">Подробнее</a>

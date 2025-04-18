@@ -9,6 +9,7 @@ from src.infrastructure.db.database import async_session_maker
 from typing import Optional, List
 from sqlalchemy.orm import joinedload
 
+
 class UsersDAO(UserRepository):
     model = User
 

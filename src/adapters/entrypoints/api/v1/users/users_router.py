@@ -16,14 +16,14 @@ async def profile_page(request: Request, user: User = Depends(get_current_user))
     return templates.TemplateResponse("profile.html", {"request": request, "user": user})
 
 
-@router.get("/", response_class=HTMLResponse)
+@router.get("/", response_class=HTMLResponse, summary="Получить всех пользователей")
 async def get_all_users_html(
         request: Request,
         role_id: Optional[int] = Query(None),
         admin_user: User = Depends(get_current_admin_user),
         user: User = Depends(user_is_auth)
 ):
-    users = await UsersDAO.find_all_by_role(role_id)  # Новый метод в DAO
+    users = await UsersDAO.find_all_by_role(role_id)
 
     return templates.TemplateResponse(
         "all_users.html",
