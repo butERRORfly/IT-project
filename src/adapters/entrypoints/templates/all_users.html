@@ -37,11 +37,10 @@
 
     <div class="filters">
     <form method="get" action="/users/">
-        <select name="role" onchange="this.form.submit()" id="roleSelect">
+        <select name="role_id" onchange="this.form.submit()" id="roleSelect">
             <option value="">Все роли</option>
-            <option value="0" {% if current_role_filter == 0 %}selected{% endif %}>User</option>
-            <option value="1" {% if current_role_filter == 1 %}selected{% endif %}>Admin</option>
-            <option value="2" {% if current_role_filter == 2 %}selected{% endif %}>Super Admin</option>
+            <option value="1" {% if current_role_filter == 1 %}selected{% endif %}>User</option>
+            <option value="2" {% if current_role_filter == 2 %}selected{% endif %}>Admin</option>
         </select>
     </form>
     </div>
@@ -55,12 +54,10 @@
             <p>ID: {{ user.id }}</p>
             <span class="info-label">Роль:</span>
             <span class="info-value">
-                {% if user.role == 2 %}Super Admin
-                {% elif user.role == 1 %}Admin
-                {% else %}User{% endif %}
+                {% if user.role_id == 2 %}Admin
+                {% else %}User
+                {% endif %}
             </span>
-            {% if user.is_admin %}
-            {% endif %}
             <a href="/users/{{ user.id }}/">Подробнее</a>
         </div>
         {% endfor %}

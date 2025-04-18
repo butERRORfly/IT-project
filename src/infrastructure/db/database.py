@@ -1,9 +1,9 @@
 from datetime import datetime
 from typing import Annotated
 
-from sqlalchemy import func
+from sqlalchemy import func, ForeignKey
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncAttrs
-from sqlalchemy.orm import DeclarativeBase, declared_attr, Mapped, mapped_column
+from sqlalchemy.orm import DeclarativeBase, declared_attr, Mapped, mapped_column, relationship
 from sqlalchemy import text, Integer
 from src.configurator.config import get_db_url
 
@@ -31,6 +31,15 @@ class Base(AsyncAttrs, DeclarativeBase):
     updated_at: Mapped[updated_at]
 
 
+class Role(Base):
+    id: Mapped[int_pk]
+    name: Mapped[str_uniq]
+    description: Mapped[str_null_true]
+    # permissions: Mapped[str_null_true]  # решить нужно или нет
+
+    users: Mapped[list["User"]] = relationship(back_populates="role_rel")
+
+
 class User(Base):
     id: Mapped[int_pk]
     phone_number: Mapped[str_uniq]
@@ -38,7 +47,9 @@ class User(Base):
     last_name: Mapped[str]
     email: Mapped[str_uniq]
     password: Mapped[str]
-    role: Mapped[role_type]
+    role_id: Mapped[int] = mapped_column(Integer, ForeignKey("roles.id"), default=1, server_default=text('1'))
+
+    role_rel: Mapped["Role"] = relationship(back_populates="users")
 
     def __repr__(self):
         return f"{self.__class__.__name__}(id={self.id})"

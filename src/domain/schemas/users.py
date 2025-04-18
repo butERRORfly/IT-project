@@ -8,6 +8,7 @@ class UserRegister(BaseModel):
     phone_number: str = Field(..., description="Номер телефона в международном формате, начинающийся с '+'")
     first_name: str = Field(..., min_length=3, max_length=50, description="Имя, от 3 до 50 символов")
     last_name: str = Field(..., min_length=3, max_length=50, description="Фамилия, от 3 до 50 символов")
+    role_id: int = Field(default=1, description="ID роли пользователя (1 - user, 2 - admin)", ge=1, le=2)
 
     @field_validator("phone_number")
     @classmethod

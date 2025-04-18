@@ -16,16 +16,14 @@ async def profile_page(request: Request, user: User = Depends(get_current_user))
     return templates.TemplateResponse("profile.html", {"request": request, "user": user})
 
 
-@router.get("/", response_class=HTMLResponse, summary="Получить всех пользователей")
+@router.get("/", response_class=HTMLResponse)
 async def get_all_users_html(
         request: Request,
-        role: Optional[int] = Query(None, description="Фильтр по роли (0-User, 1-Admin, 2-Super Admin)"),
+        role_id: Optional[int] = Query(None),
         admin_user: User = Depends(get_current_admin_user),
         user: User = Depends(user_is_auth)
 ):
-    filter_params = {"role": role} if role is not None else {}
-
-    users = await UsersDAO.find_all(**filter_params)
+    users = await UsersDAO.find_all_by_role(role_id)  # Новый метод в DAO
 
     return templates.TemplateResponse(
         "all_users.html",
@@ -34,7 +32,7 @@ async def get_all_users_html(
             "users": users,
             "user": user,
             "admin": admin_user,
-            "current_role_filter": role
+            "current_role_filter": role_id
         }
     )
 
@@ -96,7 +94,7 @@ async def change_user_role(
             detail="Нельзя изменить свою собственную роль"
         )
 
-    valid_roles = [0, 1, 2]
+    valid_roles = [1, 2]
     if id_role not in valid_roles:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,

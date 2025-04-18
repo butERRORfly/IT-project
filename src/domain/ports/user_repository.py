@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
-from typing import List
+from typing import List, Optional
 
-from src.domain.models.user import UserD
+from src.domain.models.user import UserD, RoleD
 
 class UserRepository(ABC):
     model = None
@@ -27,5 +27,13 @@ class UserRepository(ABC):
         pass
 
     @abstractmethod
-    def delet_by_id(self, user_id) -> bool:
+    def delete_by_id(self, user_id) -> bool:
+        pass
+
+    @abstractmethod
+    def get_role_by_id(self, role_id: int) -> Optional[RoleD]:
+        pass
+
+    @abstractmethod
+    def get_all_roles(self) -> List[RoleD]:
         pass

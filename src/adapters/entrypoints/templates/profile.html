@@ -101,14 +101,14 @@
             <div class="info-row">
                 <span class="info-label">Роль:</span>
                 <span class="info-value">
-                    {% if user.role == 2 %}Super Admin
-                    {% elif user.role == 1 %}Admin
+                    {% if user.role_id == 2 %}Admin
+                    {% elif user.role_id == 1 %}User
                     {% else %}User{% endif %}
                 </span>
             </div>
         </div>
 
-        {% if user.role == 2 %}
+        {% if user.role_id == 2 %}
         <form action="/users/" class="logout-form">
             <button type="submit" class="role-btn">Админ панель</button>
         </form>
