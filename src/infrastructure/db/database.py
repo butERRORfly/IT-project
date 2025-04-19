@@ -1,10 +1,10 @@
 from datetime import datetime
 from typing import Annotated
 
-from sqlalchemy import func
+from sqlalchemy import func, ForeignKey
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncAttrs
-from sqlalchemy.orm import DeclarativeBase, declared_attr, Mapped, mapped_column
-from sqlalchemy import text
+from sqlalchemy.orm import DeclarativeBase, declared_attr, Mapped, mapped_column, relationship
+from sqlalchemy import text, Integer
 from src.configurator.config import get_db_url
 
 DATABASE_URL = get_db_url()
@@ -17,6 +17,7 @@ created_at = Annotated[datetime, mapped_column(server_default=func.now())]
 updated_at = Annotated[datetime, mapped_column(server_default=func.now(), onupdate=datetime.now)]
 str_uniq = Annotated[str, mapped_column(unique=True, nullable=False)]
 str_null_true = Annotated[str, mapped_column(nullable=True)]
+role_type = Annotated[int, mapped_column(Integer, default=0, server_default=text('0'), nullable=False)]
 
 
 class Base(AsyncAttrs, DeclarativeBase):
@@ -30,6 +31,15 @@ class Base(AsyncAttrs, DeclarativeBase):
     updated_at: Mapped[updated_at]
 
 
+class Role(Base):
+    id: Mapped[int_pk]
+    name: Mapped[str_uniq]
+    description: Mapped[str_null_true]
+    # permissions: Mapped[str_null_true]  # решить нужно или нет
+
+    users: Mapped[list["User"]] = relationship(back_populates="role_rel")
+
+
 class User(Base):
     id: Mapped[int_pk]
     phone_number: Mapped[str_uniq]
@@ -37,12 +47,9 @@ class User(Base):
     last_name: Mapped[str]
     email: Mapped[str_uniq]
     password: Mapped[str]
+    role_id: Mapped[int] = mapped_column(Integer, ForeignKey("roles.id"), default=1, server_default=text('1'))
 
-    is_user: Mapped[bool] = mapped_column(default=True, server_default=text('true'), nullable=False)
-    is_admin: Mapped[bool] = mapped_column(default=False, server_default=text('false'), nullable=False)
-    is_super_admin: Mapped[bool] = mapped_column(default=False, server_default=text('false'), nullable=False)
-
-    extend_existing = True
+    role_rel: Mapped["Role"] = relationship(back_populates="users")
 
     def __repr__(self):
         return f"{self.__class__.__name__}(id={self.id})"

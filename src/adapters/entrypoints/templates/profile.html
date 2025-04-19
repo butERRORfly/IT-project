@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <title>User Profile</title>
+    <style>
+<!--        body {-->
+<!--            font-family: Arial, sans-serif;-->
+<!--            background-color: #f4f4f9;-->
+<!--            margin: 0;-->
+<!--            padding: 0;-->
+<!--            display: flex;-->
+<!--            justify-content: center;-->
+<!--            align-items: center;-->
+<!--            height: 100vh;-->
+<!--        }-->
+        .profile-container {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        h2 {
+            margin-top: 0;
+            color: #333;
+            text-align: center;
+        }
+        .user-info {
+            margin-bottom: 1.5rem;
+        }
+        .info-row {
+            display: flex;
+            margin-bottom: 0.5rem;
+        }
+        .info-label {
+            font-weight: bold;
+            width: 120px;
+            color: #555;
+        }
+        .info-value {
+            flex-grow: 1;
+        }
+        .logout-btn {
+            display: block;
+            width: 100%;
+            padding: 0.75rem;
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            text-align: center;
+            text-decoration: none;
+            margin-bottom: 10px;
+        }
+        .logout-btn:hover {
+            background-color: #c82333;
+        }
+
+        .role-btn {
+            display: block;
+            width: 100%;
+            padding: 0.75rem;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .role-btn:hover {
+            background-color: #0069d9;
+        }
+    </style>
+
+    <div class="profile-container">
+        <h2>Профиль пользователя</h2>
+
+        <div class="user-info">
+            <div class="info-row">
+                <span class="info-label">Имя:</span>
+                <span class="info-value">{{ user.first_name }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Фамилия:</span>
+                <span class="info-value">{{ user.last_name }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Email:</span>
+                <span class="info-value">{{ user.email }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Телефон:</span>
+                <span class="info-value">{{ user.phone_number }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Роль:</span>
+                <span class="info-value">
+                    {% if user.role_id == 2 %}Admin
+                    {% elif user.role_id == 1 %}User
+                    {% else %}User{% endif %}
+                </span>
+            </div>
+        </div>
+
+        {% if user.role_id == 2 %}
+        <form action="/users/" class="logout-form">
+            <button type="submit" class="role-btn">Админ панель</button>
+        </form>
+        {% endif %}
+
+        <form action="/auth/logout" method="post" class="logout-form">
+            <button type="submit" class="logout-btn">Выйти</button>
+        </form>
+
+
+    </div>
+{% endblock %}

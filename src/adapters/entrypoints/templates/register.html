@@ -1,0 +1,166 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <title>Регистрация</title>
+    <style>
+<!--        body {-->
+<!--            font-family: Arial, sans-serif;-->
+<!--            background-color: #f4f4f9;-->
+<!--            margin: 0;-->
+<!--            padding: 0;-->
+<!--            display: flex;-->
+<!--            justify-content: center;-->
+<!--            align-items: center;-->
+<!--            height: 100vh;-->
+<!--        }-->
+        .register-container {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        h2 {
+            margin-top: 0;
+            color: #333;
+            text-align: center;
+        }
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #555;
+        }
+        input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            width: 100%;
+            padding: 0.75rem;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .error {
+            color: #dc3545;
+            margin-top: 0.5rem;
+            font-size: 0.875rem;
+        }
+        .success {
+            color: #28a745;
+            margin-top: 0.5rem;
+            font-size: 0.875rem;
+        }
+        .login-link {
+            text-align: center;
+            margin-top: 1rem;
+        }
+    </style>
+
+    <div class="register-container">
+        <h2>Регистрация</h2>
+        <form id="registerForm">
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Пароль (от 5 до 50 символов)</label>
+                <input type="password" id="password" name="password" required minlength="5" maxlength="50">
+            </div>
+            <div class="form-group">
+                <label for="phone_number">Номер телефона (+79991234567)</label>
+                <input type="tel" id="phone_number" name="phone_number" pattern="\+\d{5,15}" required>
+            </div>
+            <div class="form-group">
+                <label for="first_name">Имя (от 3 до 50 символов)</label>
+                <input type="text" id="first_name" name="first_name" required minlength="3" maxlength="50">
+            </div>
+            <div class="form-group">
+                <label for="last_name">Фамилия (от 3 до 50 символов)</label>
+                <input type="text" id="last_name" name="last_name" required minlength="3" maxlength="50">
+            </div>
+            <button type="submit">Зарегистрироваться</button>
+            <div id="errorMessage" class="error"></div>
+            <div id="successMessage" class="success"></div>
+        </form>
+        <div class="login-link">
+            Уже есть аккаунт? <a href="/auth/login/">Войти</a>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('registerForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            // Получаем данные формы
+            const formData = {
+                email: document.getElementById('email').value,
+                password: document.getElementById('password').value,
+                phone_number: document.getElementById('phone_number').value,
+                first_name: document.getElementById('first_name').value,
+                last_name: document.getElementById('last_name').value
+            };
+
+            // Очищаем сообщения
+            document.getElementById('errorMessage').textContent = '';
+            document.getElementById('successMessage').textContent = '';
+
+            try {
+                const response = await fetch('/auth/register/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                if (response.ok) {
+                    document.getElementById('successMessage').textContent = 'Регистрация прошла успешно! Перенаправляем на страницу входа...';
+
+                    // Редирект через 1 секунду
+                    setTimeout(() => {
+                        window.location.href = '/auth/login/?message=registration_success';
+                    }, 1000);
+                } else {
+                    const data = await response.json();
+                    let errorMessage = 'Ошибка при регистрации';
+
+                    if (data.detail === 'Пользователь уже существует') {
+                        errorMessage = 'Пользователь с таким email уже зарегистрирован';
+                    } else if (data.detail) {
+                        errorMessage = data.detail;
+                    }
+
+                    document.getElementById('errorMessage').textContent = errorMessage;
+                }
+            } catch (error) {
+                document.getElementById('errorMessage').textContent = 'Ошибка соединения с сервером';
+            }
+        });
+
+        // Валидация номера телефона в реальном времени
+        document.getElementById('phone_number').addEventListener('input', function(e) {
+            if (!this.value.startsWith('+')) {
+                this.setCustomValidity('Номер должен начинаться с +');
+            } else {
+                this.setCustomValidity('');
+            }
+        });
+    </script>
+
+{% endblock %}

@@ -2,23 +2,12 @@ services:
   postgres:
     image: postgres:latest
     container_name: postgres_fast_api
-    environment:
-      POSTGRES_USER: xololibra
-      POSTGRES_PASSWORD: kp0j_b1753
-      POSTGRES_DB: fast_api
-      PGDATA: /var/lib/postgresql/data/pgdata
+    env_file:
+      - .env
     ports:
       - "5434:5432"
     volumes:
-      - pgdata:/var/lib/postgresql/data/pgdata
-    deploy:
-      resources:
-        limits:
-          cpus: '0.50'
-          memory: 512M
-        reservations:
-          cpus: '0.25'
-          memory: 256M
+      - pgdata:/var/lib/postgresql/data
     command: >
       postgres -c max_connections=1000
                -c shared_buffers=256MB

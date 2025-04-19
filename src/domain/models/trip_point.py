@@ -1,17 +1,16 @@
 import datetime
-import uuid
 from dataclasses import dataclass
 
 
 @dataclass
 class TripPoint:
-    """Сущность Точки Путешествия"""
-
-    id : uuid.UUID
-    trip_id : uuid.UUID
-    country : str
-    city : str
-    arrival_time : datetime
-    departure_time : datetime
-    cost : float
-    airport : str
+    """Сущность точки путешествия"""
+    point: str
+    date_to: datetime.date
+    date_out: datetime.date
+    hotel: str
+    air: str
+    icao: str
+    converted_rate: str  # переведенная валюта в USD
+    cost: str  # значение и валюта которую ввели
+    type: str  # Метод передвижения
