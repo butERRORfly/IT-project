@@ -1,0 +1,12 @@
+.select-container {
+    width: 100%;
+    height: auto;
+    padding: 2rem;
+    border: 1px solid #000; /* Тонкая чёрная граница */
+    border-radius: 4px;
+    transition: transform 0.3s ease;
+}
+
+.select-container:hover {
+    transform: scale(1.02);
+}

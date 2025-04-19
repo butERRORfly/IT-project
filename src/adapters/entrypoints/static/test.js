@@ -1,4 +1,4 @@
-let formCount = 1;
+let formCount = 0;
 async function convert(from, to, amount) {
   try {
     const response = await fetch(`https://api.frankfurter.dev/v1/latest?base=${from}&symbols=${to}`);
@@ -16,10 +16,9 @@ function addForm() {
     const newFormContainer = document.createElement('div');
     newFormContainer.classList.add('form-container');
     newFormContainer.id = `form-container-${formCount}`;
-
-
     const pointFormItem = document.createElement('div');
     pointFormItem.classList.add('form-item');
+    pointFormItem.classList.add('form');
     pointFormItem.classList.add("name");
     const pointLabel = document.createElement('label');
     pointLabel.setAttribute('for', `point-${formCount}`);
@@ -32,13 +31,35 @@ function addForm() {
     pointFormItem.appendChild(pointLabel);
     pointFormItem.appendChild(pointInput);
 
+    const block = document.createElement('div');
+    block.classList.add("form");
+    block.classList.add('form-item');
+    block.classList.add("name");
+    const wayLabel = document.createElement('label');
+    wayLabel.textContent = 'Транспорт';
+    const typeWay = document.createElement('select');
+    typeWay.classList.add('selector');
+    wayLabel.classList.add('name');
+    typeWay.id = `type_way-${formCount}`;
+    const option1 = document.createElement('option');
+    option1.value = 'car';
+    option1.textContent = 'car';
+    const option2 = document.createElement('option');
+    option2.value = 'poliline';
+    option2.textContent = 'poliline';
+    typeWay.appendChild(option1);
+    typeWay.appendChild(option2);
+    typeWay.value = 'poliline';
+    block.appendChild(wayLabel);
+    block.appendChild(typeWay);
 
     const dateFormItem = document.createElement('div');
     dateFormItem.classList.add('form-item');
+    dateFormItem.classList.add('form');
     dateFormItem.classList.add("name");
     const dateLabel = document.createElement('label');
     dateLabel.setAttribute('for', `date_to-${formCount}`);
-    dateLabel.textContent = `Дата отбытия ${formCount}:`;
+    dateLabel.textContent = `Дата прибытия ${formCount}:`;
     const dateInput = document.createElement('input');
     dateInput.type = 'date';
     dateInput.id = `date_to-${formCount}`;
@@ -46,10 +67,10 @@ function addForm() {
     dateFormItem.appendChild(dateLabel);
     dateFormItem.appendChild(dateInput);
 
-
     const dateFormItem1 = document.createElement('div');
     dateFormItem1.classList.add('form-item');
     dateFormItem1.classList.add("name");
+    dateFormItem1.classList.add('form');
     const dateOutLabel = document.createElement('label');
     dateOutLabel.setAttribute('for', `date_out-${formCount}`);
     dateOutLabel.textContent = `Дата отбытия ${formCount}:`;
@@ -60,10 +81,10 @@ function addForm() {
     dateFormItem1.appendChild(dateOutLabel);
     dateFormItem1.appendChild(dateOutInput);
 
-
     const hotelFormItem = document.createElement('div');
     hotelFormItem.classList.add('form-item');
     hotelFormItem.classList.add("name");
+    hotelFormItem.classList.add('form');
     const hotelLabel = document.createElement('label');
     hotelLabel.setAttribute('for', `gost-${formCount}`);
     hotelLabel.textContent = `Гостиница ${formCount}:`;
@@ -74,9 +95,9 @@ function addForm() {
     hotelFormItem.appendChild(hotelLabel);
     hotelFormItem.appendChild(hotelInput);
 
-
     const airPortFormItem = document.createElement('div');
     airPortFormItem.classList.add('form-item');
+    airPortFormItem.classList.add('form');
     airPortFormItem.classList.add("name");
     const airPortLabel = document.createElement('label');
     airPortLabel.setAttribute('for', `air-${formCount}`);
@@ -87,7 +108,6 @@ function addForm() {
     airPortInput.name = `air-${formCount}`;
     airPortFormItem.appendChild(airPortLabel);
     airPortFormItem.appendChild(airPortInput);
-
 
     const icaoFormItem = document.createElement('div');
     icaoFormItem.classList.add('form-item');
@@ -103,9 +123,9 @@ function addForm() {
     icaoFormItem.appendChild(icaoLabel);
     icaoFormItem.appendChild(icaoInput);
 
-
     const priceFormItem = document.createElement('div');
     priceFormItem.classList.add('form-item');
+    priceFormItem.classList.add('form');
     priceFormItem.classList.add("name");
     const priceLabel = document.createElement('label');
     priceLabel.setAttribute('for', `cost-${formCount}`);
@@ -118,22 +138,31 @@ function addForm() {
     priceFormItem.appendChild(priceInput);
     priceInput.required = true;
 
-
     const rate = document.createElement('div');
     rate.classList.add('form-item');
+    rate.classList.add('form');
     rate.classList.add("name");
     const rateLabel = document.createElement('label');
     rateLabel.setAttribute('for', `rate-${formCount}`);
     rateLabel.textContent = `Расчетная валюта ${formCount}:`;
-    const rateInput = document.createElement('input');
-    rateInput.type = 'text';
-    rateInput.id = `rate-${formCount}`;
-    rateInput.name = `rate-${formCount}`;
+    const VAL = document.createElement('select');
+    VAL.classList.add('selector');
+    VAL.id = `rate-${formCount}`;
+    VAL.name = `rate-${formCount}`;
     rate.appendChild(rateLabel);
-    rate.appendChild(rateInput);
-    rateInput.required = true;
+    rate.appendChild(VAL);
+
+    const delete_block = document.createElement('button');
+    delete_block.classList.add('form-item');
+    delete_block.classList.add('delete-btn');
+    delete_block.id = `deleter-${formCount}`;
+    delete_block.textContent = `Удалить точку`;
+    delete_block.addEventListener('click', (event) => {
+            delete_point(event, formCount);
+    });
 
     newFormContainer.appendChild(pointFormItem);
+    newFormContainer.appendChild(block);
     newFormContainer.appendChild(dateFormItem);
     newFormContainer.appendChild(dateFormItem1);
     newFormContainer.appendChild(hotelFormItem);
@@ -141,35 +170,36 @@ function addForm() {
     newFormContainer.appendChild(icaoFormItem);
     newFormContainer.appendChild(priceFormItem);
     newFormContainer.appendChild(rate);
-
+    newFormContainer.appendChild(delete_block);
 
     document.getElementById('form-wrapper').insertBefore(newFormContainer, document.querySelector('.add-button'));
+    add_cur()
 }
-
-
 
 async function submitData() {
     try {
         const formsData = [];
-
-        for (let i = 1; i <= formCount; i++) {
+        for (let i = 0; i <= formCount; i++) {
             const point = document.getElementById(`point-${i}`).value;
             const date_to = document.getElementById(`date_to-${i}`).value;
             const date_out = document.getElementById(`date_out-${i}`).value;
             const gost = document.getElementById(`gost-${i}`).value;
             const air = document.getElementById(`air-${i}`).value;
             const icao = document.getElementById(`icao-${i}`).value;
+            const typic = document.getElementById(`type_way-${i}`).value;
             let cost = document.getElementById(`cost-${i}`).value;
             const rate = document.getElementById(`rate-${i}`).value;
+            const cost_for_usd = cost;
             cost = (cost+'-'+rate).toUpperCase();
-            if (rate.toUpperCase() == "USD"){
-                const convertedRate = cost;
-                formsData.push({ point, date_to, date_out, gost, air, icao, convertedRate, cost });
+            console.log(rate);
+            if (rate.toUpperCase() == 'USD'){
+                const convertedRate = cost_for_usd;
+                formsData.push({ point, date_to, date_out, gost, air, icao, convertedRate, cost, typic });
             }
             else{
                 const convertedRate = await convert(rate.toUpperCase(), 'USD', parseInt(cost));
                 console.log(convertedRate);
-                formsData.push({ point, date_to, date_out, gost, air, icao, convertedRate, cost });
+                formsData.push({ point, date_to, date_out, gost, air, icao, convertedRate, cost, typic });
             }
         }
 
@@ -190,8 +220,6 @@ async function submitData() {
 
         const result = await response.text();
         document.open();
-
-        const script = document.createElement('script');
         document.write(result);
         document.close();
 
@@ -200,3 +228,53 @@ async function submitData() {
         alert('Ошибка сети или сервера.');
     }
 }
+function delete_point(event,id){
+    let point_to_delete = document.getElementById(`form-container-${id}`);
+    point_to_delete.remove();
+    formCount = formCount-1;
+}
+
+function add_cur(){
+    const currencies = [
+   { "code": "AUD", "name": "Australian Dollar" },
+   { "code": "BGN", "name": "Bulgarian Lev" },
+   { "code": "BRL", "name": "Brazilian Real" },
+   { "code": "CAD", "name": "Canadian Dollar" },
+   { "code": "CHF", "name": "Swiss Franc" },
+   { "code": "CNY", "name": "Chinese Yuan" },
+   { "code": "CZK", "name": "Czech Koruna" },
+   { "code": "DKK", "name": "Danish Krone" },
+   { "code": "EUR", "name": "Euro" },
+   { "code": "GBP", "name": "British Pound Sterling" },
+   { "code": "HKD", "name": "Hong Kong Dollar" },
+   { "code": "HUF", "name": "Hungarian Forint" },
+   { "code": "IDR", "name": "Indonesian Rupiah" },
+   { "code": "ILS", "name": "Israeli New Shekel" },
+   { "code": "INR", "name": "Indian Rupee" },
+   { "code": "ISK", "name": "Icelandic Krona" },
+   { "code": "JPY", "name": "Japanese Yen" },
+   { "code": "KRW", "name": "South Korean Won" },
+   { "code": "MXN", "name": "Mexican Peso" },
+   { "code": "MYR", "name": "Malaysian Ringgit" },
+   { "code": "NOK", "name": "Norwegian Krone" },
+   { "code": "NZD", "name": "New Zealand Dollar" },
+   { "code": "PHP", "name": "Philippine Peso" },
+   { "code": "PLN", "name": "Polish Zloty" },
+   { "code": "RON", "name": "Romanian Leu" },
+   { "code": "SEK", "name": "Swedish Krona" },
+   { "code": "SGD", "name": "Singapore Dollar" },
+   { "code": "THB", "name": "Thai Baht" },
+   { "code": "TRY", "name": "Turkish Lira" },
+   { "code": "USD", "name": "United States Dollar" },
+   { "code": "ZAR", "name": "South African Rand" }
+   ];
+   const select = document.getElementById(`rate-${formCount}`);
+   for (let i = 0; i < currencies.length; i++) {
+     const option = document.createElement('option');
+     option.value = currencies[i].code;
+     option.textContent = currencies[i].name;
+     select.appendChild(option);
+   }
+   select.value = "USD";
+}
+add_cur()

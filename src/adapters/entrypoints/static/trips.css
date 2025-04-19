@@ -12,6 +12,15 @@ body {
     background-attachment: fixed;
 }
 
+.selector{
+    padding: 10px 15px;
+    margin-left:0px;
+    width: 200px;
+    height: 40px;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+    size:1;
+}
 
 .form-container-wrapper {
     background-color: #fff;
@@ -95,7 +104,7 @@ h1 {
 }
 .end{
     padding: 15px 30px;
-    margin-top: 30px; 
+    margin-top: 30px;
     border-radius: 25px;
     border: none;
     background-color: #4CAF50;
@@ -110,6 +119,4 @@ padding-left:20px;
  #map {
  width: 600px;
  height: 400px;
-
-
 }

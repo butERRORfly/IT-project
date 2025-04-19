@@ -34,6 +34,7 @@ async def return_page():
     print('[200]')
     return HTMLResponse(content=html_content)
 
+
 @rout.get('/map',response_class=HTMLResponse)
 async def f():
     with open("src/adapters/entrypoints/templates/map.html", "r", encoding="utf-8") as file:
@@ -50,18 +51,23 @@ class FormData(BaseModel):
     icao: str
     convertedRate: str  # переведенная валюта в USD
     cost: str   # значение и валюта которую ввели
+    typic: str # Метод передвижения
 
 def booking_url(param: str):
     return f'https://www.booking.com/searchresults.html?ss={param}'
 
 
 def calculate_date_difference(date1_str, date2_str):
-    date1 = datetime.strptime(date1_str, "%Y-%m-%d")
-    date2 = datetime.strptime(date2_str, "%Y-%m-%d")
-    difference = (date2 - date1).days
-    if difference < 0: return 'Ошибка при вводе'
-    else:
-        return f'Расчёт дней: {difference}'
+    try:
+        date1 = datetime.strptime(date1_str, "%Y-%m-%d")
+        date2 = datetime.strptime(date2_str, "%Y-%m-%d")
+        difference = (date2 - date1).days
+        if difference < 0:
+            return 'Ошибка при вводе'
+        else:
+            return f'Расчёт дней: {difference}'
+    except:
+        return 'Uncorected data'
 
 
 
@@ -80,7 +86,8 @@ async def submit_data(request: Request, forms: List[FormData]):
         'date_out': [i.date_out for i in forms],
         'gost': [i.gost for i in forms],
         'cost': [i.cost for i in forms],
-        'rec':[booking_url(i.point) for i in forms],
-        'wait':[calculate_date_difference(i.date_to,i.date_out) for i in forms]
+        'rec': [booking_url(i.point) for i in forms],
+        'wait': [calculate_date_difference(i.date_to,i.date_out) for i in forms],
+        'typic': [i.typic for i in forms]
     }
     return templates.TemplateResponse("map.html", {"request": request, "data": req})
