@@ -1,25 +1,48 @@
-{% extends 'base.html' %}
 
-
-{% block content %}
-
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
 <link rel="stylesheet" href="/src/adapters/entrypoints/static/icao/map.css">
 <script type="text/javascript" src="https://api-maps.yandex.ru/2.1/?apikey=6a4c745a-8968-455d-8801-aef21ebfa91b&lang=ru_RU"></script>
-
+  </head>
 <div class="map-container">
     <div id="map"></div>
-    <div id="map"></div>
-    <div class="sidebar">
+
+    <div class="sidebar" id = 's'>
         {% for i in range(data["loc"] | length) %}
         <div class="point" id="point-{{ i }}">
-            <p>Точка посещения: {{ data["loc"][i] }}</p>
-            <p>Дата прибытия: {{ data["date_to"][i] }} </p>
-            <p>Дата отбытия: {{ data["date_out"][i] }}</p>
-            <p>Гостиница: {{ data["gost"][i] }}</p>
+            <p id = 'place-{{ i }}'>Точка посещения: {{ data["loc"][i] }}</p>
+            {% if data["date_to"][i] != '!' %}
+
+            <p id = 'to-{{ i }}'>Дата прибытия: {{ data["date_to"][i] }} </p>
+            {% endif %}
+
+            <p id  = 'out-{{ i }}'>Дата отбытия: {{ data["date_out"][i] }}</p>
+
+            {% if data["air"][i] != '!' %}
+            <p id = 'airto-{{ i }}'>Аэропорт прилета: {{ data["air"][i] }} </p>
+            {% endif %}
+
+            {% if data["icao"][i] != '!' %}
+            <p id  = 'icao1-{{ i }}'>Icao код: {{ data["icao"][i] }} </p>
+            {% endif %}
+
+            {% if data["air2"][i] != '!' %}
+            <p id  = 'airout-{{ i }}'>Аэропрт вылета: {{ data["air2"][i] }}</p>
+            {% endif %}
+
+            {% if data["icao2"][i] != '!' %}
+            <p id  = 'icao2-{{ i }}'>Icao код: {{ data["icao2"][i] }}</p>
+            {% endif %}
+
+
+            <p id ='gost-{{ i }}'>Гостиница: {{ data["gost"][i] }}</p>
+            {% if i != 0%}
             <p>{{ data["wait"][i]}}</p>
-            <p> {{data["cost"][i]}}</p>
+            {% endif %}
+            <p id="cost-{{ i }}"> {{data["cost"][i]}}</p>
             <p class="rater-{{ i }}" id="rater-{{ i }}">Loading time in point...</p>
-            <p>Способ передвижения - {{data["typic"][i]}}</p>
+            <p id = 'typic-{{ i }}'>Транспорт отправления: {{data["typic"][i]}}</p>
         </div>
         <div class="point">
         </div>
@@ -33,12 +56,16 @@
         </p>
         <select id="selector"></select>
     </div>
+    <button id ='add_button' class = 'point'> Добавить точку</button>
 
 </div>
+
 <script>
+
     function delay(ms) {
         return new Promise(resolve => setTimeout(resolve, ms));
     }
+    console.log({{ data["loc"] | safe }});
 
     function spliter(time){
         return time.split(' ')[1];
@@ -65,11 +92,147 @@
             controls: ["zoomControl", "searchControl"]
         });
 
+
+
+function blocker(adr){
+  const new_point = document.createElement('div');
+  new_point.classList.add('point');
+  new_point.id = 'myUniqueId';
+  new_point.innerHTML = `
+    <p id = 'test1'> Точка посещения: "${adr}"
+    </p>
+    <p id='test2'>
+      Дата прибытия:
+      <input type="date">
+    </p>
+    <p id='test3'>
+      Дата отбытия:
+      <input type="date">
+    </p>
+    <p id ='test4'>
+      Гостиница:
+      <input >
+    </p>
+    <p id = 'test5'>
+      Планируемый бюджет:
+      <input type="number" >
+    </p>
+    <p id = 'test6'>
+    Валюта:
+    <select id = 'currencies'>
+     <option value="usd">USD</option>
+    </select>
+    </p>
+    <p id ='test7'>
+      Способ передвижения:
+    </label>
+    <p>
+    <select  class="selector" >
+      <option value="poliline" selected>poliline</option>
+      <option value="car">car</option>
+    </select>
+    </p>
+    <button type="submit" id = 'save_button'>Редактировать</button>
+  `;
+  const to = document.getElementById('s');
+  to.appendChild(new_point);
+  document.getElementById('add_button').disabled = false;
+  document.getElementById('save_button').addEventListener('click', function(e){
+    e.target.remove();
+    const form = document.getElementById('myUniqueId');
+    console.log('ass');
+    form.id = `point-${count}`;
+    const paragraphs = form.querySelectorAll('p');
+    paragraphs.forEach(p => {
+      const input = p.querySelector('input, select');
+      if (input) {
+        const labelText = p.firstChild.nodeValue?.trim();
+        let valueText = '';
+        if (input.tagName === 'SELECT') {
+          valueText = input.options[input.selectedIndex].text ;
+        } else {
+          valueText = input.value;
+        }
+        p.textContent = `${labelText} ${valueText}`;
+      }
+    });
+  });
+}
+
+
+function onMapClick(e) {
+   let cur = e.get('coords');
+   console.log(coordinates[-1]);
+   console.log(cur);
+   count = coordinates.length;
+   map.events.remove('click', onMapClick);
+   ymaps.geocode(cur).then(function (res) {
+        createCarRoute(coordinates[coordinates.length - 1],cur);
+        coordinates.push(cur);
+        let first = res.geoObjects.get(0);
+        let adr = first.getAddressLine();
+        let marker = new ymaps.Placemark(cur, {
+            balloonContent: 'Новая точка',
+            iconContent: ''
+            });
+        map.geoObjects.add(marker);
+        blocker(adr);
+   });
+ }
+
+
+document.getElementById('add_button').addEventListener('click', function () {
+  this.disabled = true;
+  map.events.add('click', onMapClick);
+  console.log('button was found');
+  });
+const getValue = (id) => {
+  const element = document.getElementById(id);
+  if (element) {
+    const text = element.innerText.trim();
+    const colonIndex = text.indexOf(':');
+    if (colonIndex !== -1) {
+      return text.substring(colonIndex + 1);
+    } else {
+      return text;
+    }
+  } else {
+    return '!';
+  }
+};
+
+document.getElementById('send_to_database').addEventListener('click', async function () {
+    server = [];
+    for (let j = 0;j < locations.length;j++){
+    const place = getValue(`place-${j}`);
+    const to = getValue(`to-${j}`);
+    const out = getValue(`out-${j}`);
+    const airto = getValue(`airto-${j}`);
+    const airout = getValue(`airout-${j}`);
+    const icao = getValue(`icao-${j}`);
+    const icao1 = getValue(`icao1-${j}`);
+    const gost = getValue(`gost-${j}`);
+    const cost = getValue(`cost-${j}`);
+    server.push({place,to,out,airto,airout,icao,icao1,gost,cost});
+    }
+    console.log(server);
+    const response = await fetch('http://127.0.0.1:8000/send', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(server)
+        });
+    console.log(response);
+    window.location.href = '/';
+});
+
         var locations = {{ data["loc"] | safe }}; // Список местоположений
         var connectionTypes = {{ data["typic"] | safe }}; // Список типов связи (car или poliline)
         connectionTypes.pop(); // удалили последний ненужный тип передвижения
         var coordinates = [];
         var validator = [];
+        let count;
 
         function geocodeLocation(location) {
             return new Promise(function(resolve, reject) {
@@ -176,6 +339,7 @@
             }
         }
         promiseChain.then(async function() {
+
             for (let i = 0; i < validator.length; i++){
                 await new Promise(resolve => setTimeout(resolve, 2000));
                 if (validator[i] == 0){
@@ -198,8 +362,6 @@
         });
     });
 </script>
-<button class="fixed-button">Сохранить путешествие</button>
+<button class="fixed-button" id="send_to_database">Сохранить путешествие</button>
 <script src="/src/adapters/entrypoints/static/icao/rate.js"></script>
 <script src="/src/adapters/entrypoints/static/icao/timer.js"></script>
-
-{% endblock %}
