@@ -14,11 +14,8 @@
             <nav class="nav_header">
                 <div class="nav_header_header">
                     <a href="{{ url_for('index') }}" class="nav_link_header">Главная</a>
-                    {% if not user %}
-                    <a href="{{ url_for('auth_user') }}" class="nav_link_header">Приложение</a>
-                    {% else %}
-                    <a href="{{ url_for('return_page') }}" class="nav_link_header">Приложение</a>
-                    {% endif %}
+                    {% set app_button_url = url_for('auth_user') if not user else url_for('return_page') %}
+                    <a href="{{ app_button_url }}" class="nav_link_header">Приложение</a>
                 </div>
             </nav>
             {% if not user %}
@@ -30,13 +27,17 @@
         </header>
         <main>
             {% block content %}
-            <div class="logo"><h1>Adventures</h1></div>
+            <div id="base-root" style="width: 100%;"></div>
             {% endblock %}
         </main>
-
-        <footer>
-            <p>&copy; 2025 Adventures</p>
-        </footer>
     </div>
+
+    <script>
+        window.handleAppButtonClick = () => {
+            window.location.href = "{{ app_button_url }}";
+        };
+    </script>
+
+<script src="/static/bundle-base.js" type="module"></script>
 </body>
 </html>
