@@ -101,12 +101,12 @@ class UsersDAO(UserRepository):
             return cls.map_role_to_domain(role) if role else None
 
     @classmethod
-    async def get_all_roles(cls) -> List[RoleD]:
+    async def get_all_roles(cls) -> List[int]:
         async with async_session_maker() as session:
-            query = select(Role)
+            query = select(Role.id)
             result = await session.execute(query)
             roles = result.scalars().all()
-            return [cls.map_role_to_domain(role) for role in roles]
+            return roles
 
     @classmethod
     def map_to_domain(cls, user: User) -> UserD:

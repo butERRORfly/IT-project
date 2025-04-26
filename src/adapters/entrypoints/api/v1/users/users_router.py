@@ -94,7 +94,8 @@ async def change_user_role(
             detail="Нельзя изменить свою собственную роль"
         )
 
-    valid_roles = [1, 2]
+    valid_roles = await UsersDAO.get_all_roles()
+    print(valid_roles)
     if id_role not in valid_roles:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
