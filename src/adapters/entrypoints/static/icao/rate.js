@@ -59,6 +59,9 @@ async function change_rate(){
 }
 
 change_rate();
+
+
+
 let flag_change = document.getElementById('selector');
 flag_change.addEventListener('change', function(e) {
    let to = document.getElementById('selector').value;
@@ -85,15 +88,45 @@ flag_change.addEventListener('change', function(e) {
    }
 });
 
-function create(){
+
+
+
+
+
+async function create(){
     const select = document.getElementById('currencies');
     for (let i = 0; i < currencies.length; i++) {
     const option = document.createElement('option');
     option.value = currencies[i].code;
     option.textContent = currencies[i].name;
     select.appendChild(option);
-    }
     select.value = "USD";
+    }
 }
+
+async function changer(){
+  const select = document.getElementById('currencies');
+  for (let i = 0; i < currencies.length; i++) {
+    const option = document.createElement('option');
+    option.value = currencies[i].code;
+    option.textContent = currencies[i].name;
+    select.appendChild(option);
+  }
+  select.value = "USD";
+}
+
+
+document.getElementById('add_button').addEventListener('click', function () {
+  const intervalId = setInterval(function() {
+    const targetElement = document.getElementById('currencies');
+    if (targetElement) {
+      changer(targetElement);
+      clearInterval(intervalId);
+    }
+  }, 100);
+});
+
+
+
 
 
