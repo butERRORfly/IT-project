@@ -80,8 +80,9 @@ class WayParameter(Base):
     airout:Mapped[str_null_true]
     icao:Mapped[str_null_true]
     icao1:Mapped[str_null_true]
-    gost:Mapped[str_null_true]
-    cost:Mapped[str_null_true]
+    hotel:Mapped[str_null_true]
+    price:Mapped[str_null_true]
+    type: Mapped[str_null_true]
 
     way: Mapped["Way"] = relationship(back_populates="parameters")
 
