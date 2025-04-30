@@ -159,8 +159,9 @@ class TripDao():   # Абстрактный класс - написать
                         airout=params.get('airout'),
                         icao=params.get('icao'),
                         icao1=params.get('icao1'),
-                        gost=params.get('gost'),
-                        cost=params.get('cost'),
+                        hotel=params.get('hotel'),
+                        price=params.get('price'),
+                        type=params.get('type')
                     )
                     session.add(new_parameter)
                 try:
