@@ -12,51 +12,43 @@
         {% for i in range(data["loc"] | length) %}
         <div class="point" id="point-{{ i }}">
             <p id = 'place-{{ i }}'>Точка посещения: {{ data["loc"][i] }}</p>
-            {% if data["date_to"][i] != '!' %}
+            {% if data["date_to"][i] is not none %}
 
             <p id = 'to-{{ i }}'>Дата прибытия: {{ data["date_to"][i] }} </p>
             {% endif %}
 
             <p id  = 'out-{{ i }}'>Дата отбытия: {{ data["date_out"][i] }}</p>
 
-            {% if data["air"][i] != '!' %}
+            {% if data["air"][i] is not none %}
             <p id = 'airto-{{ i }}'>Аэропорт прилета: {{ data["air"][i] }} </p>
             {% endif %}
 
-            {% if data["icao"][i] != '!' %}
+            {% if data["icao"][i] is not none %}
             <p id  = 'icao1-{{ i }}'>Icao код: {{ data["icao"][i] }} </p>
             {% endif %}
 
-            {% if data["air2"][i] != '!' %}
+            {% if data["air2"][i] is not none %}
             <p id  = 'airout-{{ i }}'>Аэропрт вылета: {{ data["air2"][i] }}</p>
             {% endif %}
 
-            {% if data["icao2"][i] != '!' %}
+            {% if data["icao2"][i] is not none %}
             <p id  = 'icao2-{{ i }}'>Icao код: {{ data["icao2"][i] }}</p>
             {% endif %}
 
-
-            <p id ='gost-{{ i }}'>Гостиница: {{ data["gost"][i] }}</p>
+            <p id ='gost-{{ i }}'>Гостиница: {{ data["hotel"][i] }}</p>
             {% if i != 0%}
             <p>{{ data["wait"][i]}}</p>
             {% endif %}
-            <p id="cost-{{ i }}"> {{data["cost"][i]}}</p>
+            <p id="cost-{{ i }}"> {{data["price"][i]}}</p>
             <p class="rater-{{ i }}" id="rater-{{ i }}">Loading time in point...</p>
             <p id = 'typic-{{ i }}'>Транспорт отправления: {{data["typic"][i]}}</p>
         </div>
-        <div class="point">
-        </div>
+
         {% endfor %}
     </div>
     <div class="point">
-        <p>total price in
-            <p2 id="rater">USD</p2>
-            -
-            <p1 id='summary'>{{data["total_score"]}}</p1>
-        </p>
         <select id="selector"></select>
     </div>
-
 
 </div>
 
@@ -65,26 +57,35 @@
     function delay(ms) {
         return new Promise(resolve => setTimeout(resolve, ms));
     }
-    console.log({{ data["loc"] | safe }});
+
 
     function spliter(time){
         return time.split(' ')[1];
     }
 
-    async function get_data_by_region(attitude,latitude){
-        try{
-            const apiKey = '17EMDDSCAKIF'; //  будем получать от сервера, пока храним в открытом виде
-            const url = `http://api.timezonedb.com/v2.1/get-time-zone?key=${apiKey}&format=json&by=position&lat=${attitude}&lng=${latitude}`;
-            let response = await fetch(url);
-            const data = await response.json();
-            await delay(2000);
-            return data;
-        }
-        catch (error) {
-            console.error('Error during data retrieval:', error);
-            return null;
-        }
+    async function get_data_by_region(latitude, longitude) {
+    try {
+      const response = await fetch('/location/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ latitude: latitude, longitude: longitude })
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        console.error('Ошибка при отправке координат:', error);
+        return null;
+      }
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error('Произошла ошибка:', error);
+      return null;
     }
+}
+
     ymaps.ready(function () {
         var map = new ymaps.Map("map", {
             center: [55.76, 37.64],
@@ -92,8 +93,8 @@
             controls: ["zoomControl", "searchControl"]
         });
 
-        var locations = {{ data["loc"] | safe }}; // Список местоположений
-        var connectionTypes = {{ data["typic"] | safe }}; // Список типов связи (car или poliline)
+        var locations = {{ data["loc"] | tojson  }}; // Список местоположений
+        var connectionTypes = {{ data["typic"] | tojson  }}; // Список типов связи (car или poliline)
         connectionTypes.pop(); // удалили последний ненужный тип передвижения
         var coordinates = [];
         var validator = [];
@@ -227,6 +228,5 @@
         });
     });
 </script>
-<button class="fixed-button" id="send_to_database">Сохранить путешествие</button>
 <script src="/src/adapters/entrypoints/static/icao/rate.js"></script>
 <script src="/src/adapters/entrypoints/static/icao/timer.js"></script>
