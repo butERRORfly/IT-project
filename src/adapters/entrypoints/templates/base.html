@@ -17,6 +17,7 @@
                     {% if not user %}
                     <a href="{{ url_for('auth_user') }}" class="nav_link_header">Приложение</a>
                     {% else %}
+                    <a href="{{ url_for('trips') }}"  class="nav_link_header">Сохраненные маршруты</a>
                     <a href="{{ url_for('return_page') }}" class="nav_link_header">Приложение</a>
                     {% endif %}
                 </div>
