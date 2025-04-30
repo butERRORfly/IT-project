@@ -15,6 +15,9 @@ import requests
 from datetime import datetime
 from src.infrastructure.db.dao.users import UsersDAO, TripDao
 from src.infrastructure.db.database import User
+import requests
+import os
+
 
 rout = APIRouter()
 templates = Jinja2Templates(directory="src/adapters/entrypoints/templates")
@@ -41,8 +44,8 @@ async def show_way(request: Request, number:int,  possible: list = Depends(legal
         'loc': [],
         'date_to': [],
         'date_out': [],
-        'gost': [],
-        'cost': [],
+        'hotel': [],
+        'price': [],
         'wait': [],
         'typic': [],
         'air': [],
@@ -53,17 +56,19 @@ async def show_way(request: Request, number:int,  possible: list = Depends(legal
     if number in possible:
         data = await TripDao.find_parameters_by_way_id(way_id = number)
         if data:
+
             for i in data:
                 parametrs['loc'].append(i.place)
                 parametrs['date_to'].append(i.to)
                 parametrs['date_out'].append(i.out)
-                parametrs['gost'].append(i.gost)
-                parametrs['cost'].append(i.cost)
-                parametrs['typic'].append('car')
+                parametrs['hotel'].append(i.hotel)
+                parametrs['price'].append(i.price)
+                parametrs['typic'].append(i.type.split()[0])
                 parametrs['air'].append(i.airto)
                 parametrs['air2'].append(i.airout)
                 parametrs['icao'].append(i.icao)
                 parametrs['icao2'].append(i.icao1)
+        print(parametrs)
         return templates.TemplateResponse("saved.html", {"request": request,"data": parametrs, "user": user})
     else:
        raise HTTPException(
@@ -90,15 +95,19 @@ class FormData(BaseModel):
 
 class RouteData(BaseModel):
     place: Optional[str]
-    to: Optional[str]
-    out: Optional[str]
-    airto: Optional[str]
-    airout: Optional[str]
-    icao: Optional[str]
-    icao1: Optional[str]
-    gost: Optional[str]
-    cost: Optional[str]
+    to: Optional[str] = None
+    out: Optional[str] = None
+    airto: Optional[str] = None
+    airout: Optional[str] = None
+    icao: Optional[str] = None
+    icao1: Optional[str] = None
+    hotel: Optional[str] = None
+    price: Optional[str] = None
+    type: Optional[str] = None
 
+class CoordinatesPayload(BaseModel):
+    latitude: float
+    longitude: float
 
 def calculate_date_difference(date1_str, date2_str) -> str:
     try:
@@ -118,7 +127,7 @@ async def submit_data(request: Request, forms: List[FormData], user: User = Depe
     req = [i.point for i in forms]
     req = {
         'total_score': str(sum([float(i.convertedRate.replace('-USD', '')) for i in forms])),
-        'loc': [i.point for i in forms if i.point != ''],
+        'loc': [i.point for i in forms],
         'date_to': [i.date_to for i in forms],
         'date_out': [i.date_out for i in forms],
         'gost': [i.gost for i in forms],
@@ -133,13 +142,30 @@ async def submit_data(request: Request, forms: List[FormData], user: User = Depe
     return templates.TemplateResponse("map.html", {"request": request, "data": req, "user": user})
 
 @rout.post("/send/")
-async def save_users_route(request: Request, forms: List[RouteData], user: User = Depends(get_current_user)):
+async def save_users_route(request: Request, forms: List[RouteData], user: User = Depends(get_current_user))->dict:
     personal_way = await TripDao.add_way(user_id = user.id)
     if personal_way is not None:
        trip = await TripDao.add_point_way(way_id = personal_way.id, data = [route.dict() for route in forms])
        if trip is not None:
            print('way was saved')
            return {'message': 'Was was sucesseful saved!'}
+
+
+@rout.post("/location/")
+async def receive_coordinates(payload: CoordinatesPayload) -> dict:
+    latitude = payload.latitude
+    longitude = payload.longitude
+    API_KEY = '17EMDDSCAKIF'
+    url = f"http://api.timezonedb.com/v2.1/get-time-zone?key={API_KEY}&format=json&by=position&lat={latitude}&lng={longitude}";
+    try:
+        response = requests.get(url)
+        response.raise_for_status()
+        data = response.json()
+        print(data)
+        return data
+    except requests.exceptions.RequestException as e:
+        print(f"Ошибка при запросе к TimezoneDB API: {e}")
+        return {'status': "ERROR"}
 
 
 
