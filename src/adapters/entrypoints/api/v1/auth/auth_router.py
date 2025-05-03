@@ -12,6 +12,11 @@ templates = Jinja2Templates(directory="src/adapters/entrypoints/templates")
 @router.post("/register/", summary="Регистрация")
 async def register_user(user_data: UserRegister) -> dict:
     user = await UsersDAO.find_one_or_none(email=user_data.email)
+    # доменная модель не инкапсулирована, так как инвариантное правило
+    # уникальности email находится вне класса пользователя
+    # но в случае использования анемичной модели - ОК
+    # user_emails = UserDAO.get_all_emails()
+    # await UserD.ensure_email_not_exists(user_data.email, user_emails)
     if user:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,

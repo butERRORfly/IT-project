@@ -12,6 +12,61 @@ async function convert(from, to, amount) {
   }
 }
 
+
+function setupAutocomplete() {
+    const airportInputs = document.querySelectorAll('.airport-autocomplete');
+
+    airportInputs.forEach(input => {
+        const resultsId = input.id.replace('airport', 'airport-results');
+        const resultsDiv = document.getElementById(resultsId);
+
+        input.addEventListener('input', async function(e) {
+            const query = e.target.value.trim();
+
+            if (query.length < 2) {
+                resultsDiv.innerHTML = '';
+                resultsDiv.style.display = 'none';
+                return;
+            }
+
+            try {
+                const response = await fetch(`/airports/search?query=${encodeURIComponent(query)}`);
+                const airports = await response.json();
+
+                resultsDiv.innerHTML = '';
+
+                if (airports.length === 0) {
+                    resultsDiv.style.display = 'none';
+                    return;
+                }
+
+                airports.forEach(airport => {
+                    const div = document.createElement('div');
+                    div.innerHTML = `<strong>${airport.name}</strong> (${airport.icao})`;
+                    div.addEventListener('click', () => {
+                        input.value = `${airport.name} (${airport.icao})`;
+                        resultsDiv.style.display = 'none';
+                    });
+                    resultsDiv.appendChild(div);
+                });
+
+                resultsDiv.style.display = 'block';
+            } catch (error) {
+                console.error('Error fetching airports:', error);
+                resultsDiv.style.display = 'none';
+            }
+        });
+        document.addEventListener('click', function(e) {
+            if (e.target !== input) {
+                resultsDiv.style.display = 'none';
+            }
+        });
+    });
+}
+
+document.addEventListener('DOMContentLoaded', setupAutocomplete);
+
+
 function addForm() {
     formCount++;
     const newFormContainer = document.createElement('div');

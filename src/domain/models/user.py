@@ -1,12 +1,14 @@
 from dataclasses import dataclass
 from typing import Optional
 
+
 @dataclass
 class RoleD:
     id: int
     name: str
     description: Optional[str] = None
     # permissions: Optional[str] = None  # смотреть database.py
+
 
 @dataclass
 class UserD:

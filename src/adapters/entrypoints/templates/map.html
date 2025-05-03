@@ -356,7 +356,8 @@ const getValue = (id) => {
 
 document.getElementById('send_to_database').addEventListener('click', async function () {
     server = [];
-    for (let j = 0;j < count + 1;j++){
+    console.log(count);
+    for (let j = 0;j < coordinates.length;j++){
     const place = getValue(`place-${j}`);
     const to = getValue(`to-${j}`);
     const out = getValue(`out-${j}`);
@@ -369,7 +370,7 @@ document.getElementById('send_to_database').addEventListener('click', async func
     const type = getValue(`typic-${j}`);
     server.push({place,to,out,airto,airout,icao,icao1,hotel,price,type});
     }
-    console.log(server);
+
     const response = await fetch('http://127.0.0.1:8000/send', {
             method: 'POST',
             headers: {

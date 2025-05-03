@@ -98,3 +98,11 @@ class Way(Base):
 
     def __repr__(self):
         return f"{self.__class__.__name__}(id={self.id}, user_id={self.user_id})"
+
+
+class Airport:
+    __tablename__ = 'icao'
+
+    country_code: Mapped[str_null_true]
+    icao: Mapped[str_null_true]
+    name: Mapped[str_null_true]

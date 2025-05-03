@@ -1,11 +1,10 @@
-from src.domain.ports.trip_repository import UserRepository
+from src.domain.ports.trip_repository import TripRepository
 from src.domain.models.user import UserD, RoleD
 from src.infrastructure.db.database import async_session_maker, User, Role, Way, WayParameter
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.future import select
 from sqlalchemy import delete, update
 from src.domain.ports.user_repository import UserRepository
-from src.infrastructure.db.database import async_session_maker
 from typing import Optional, List
 from sqlalchemy.orm import joinedload
 
@@ -159,8 +158,9 @@ class TripDao():   # Абстрактный класс - написать
                         airout=params.get('airout'),
                         icao=params.get('icao'),
                         icao1=params.get('icao1'),
-                        gost=params.get('gost'),
-                        cost=params.get('cost'),
+                        hotel=params.get('hotel'),
+                        price=params.get('price'),
+                        type=params.get('type')
                     )
                     session.add(new_parameter)
                 try:

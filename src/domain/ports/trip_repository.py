@@ -3,7 +3,8 @@ from typing import List
 
 from src.domain.models.trip import Trip
 
-class UserRepository(ABC):
+
+class TripRepository(ABC):
     @abstractmethod
     def find_all(self, **kwargs) -> List[Trip]:
         pass

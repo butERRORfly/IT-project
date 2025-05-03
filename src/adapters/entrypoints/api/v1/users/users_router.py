@@ -107,5 +107,6 @@ async def change_user_role(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Не удалось обновить роль пользователя"
         )
+    # 500 - когда плохо серверу, а тут нужно полнимать ошибку данных
 
     return updated_user
