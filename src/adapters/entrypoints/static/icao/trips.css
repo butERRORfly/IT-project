@@ -23,7 +23,7 @@ main {
     width: 700px;
     text-align: center;
     overflow-y: auto;
-    max-height: 600px;
+    margin: 1% 0%;
     position: relative;
 }
 
