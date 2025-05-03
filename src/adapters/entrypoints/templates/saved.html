@@ -1,0 +1,232 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+<link rel="stylesheet" href="/src/adapters/entrypoints/static/icao/map.css">
+<script type="text/javascript" src="https://api-maps.yandex.ru/2.1/?apikey=6a4c745a-8968-455d-8801-aef21ebfa91b&lang=ru_RU"></script>
+  </head>
+<div class="map-container">
+    <div id="map"></div>
+
+    <div class="sidebar" id = 's'>
+        {% for i in range(data["loc"] | length) %}
+        <div class="point" id="point-{{ i }}">
+            <p id = 'place-{{ i }}'>Точка посещения: {{ data["loc"][i] }}</p>
+            {% if data["date_to"][i] is not none %}
+
+            <p id = 'to-{{ i }}'>Дата прибытия: {{ data["date_to"][i] }} </p>
+            {% endif %}
+
+            <p id  = 'out-{{ i }}'>Дата отбытия: {{ data["date_out"][i] }}</p>
+
+            {% if data["air"][i] is not none %}
+            <p id = 'airto-{{ i }}'>Аэропорт прилета: {{ data["air"][i] }} </p>
+            {% endif %}
+
+            {% if data["icao"][i] is not none %}
+            <p id  = 'icao1-{{ i }}'>Icao код: {{ data["icao"][i] }} </p>
+            {% endif %}
+
+            {% if data["air2"][i] is not none %}
+            <p id  = 'airout-{{ i }}'>Аэропрт вылета: {{ data["air2"][i] }}</p>
+            {% endif %}
+
+            {% if data["icao2"][i] is not none %}
+            <p id  = 'icao2-{{ i }}'>Icao код: {{ data["icao2"][i] }}</p>
+            {% endif %}
+
+            <p id ='gost-{{ i }}'>Гостиница: {{ data["hotel"][i] }}</p>
+            {% if i != 0%}
+            <p>{{ data["wait"][i]}}</p>
+            {% endif %}
+            <p id="cost-{{ i }}"> {{data["price"][i]}}</p>
+            <p class="rater-{{ i }}" id="rater-{{ i }}">Loading time in point...</p>
+            <p id = 'typic-{{ i }}'>Транспорт отправления: {{data["typic"][i]}}</p>
+        </div>
+
+        {% endfor %}
+    </div>
+    <div class="point">
+        <select id="selector"></select>
+    </div>
+
+</div>
+
+<script>
+
+    function delay(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+
+    function spliter(time){
+        return time.split(' ')[1];
+    }
+
+    async function get_data_by_region(latitude, longitude) {
+    try {
+      const response = await fetch('/location/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ latitude: latitude, longitude: longitude })
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        console.error('Ошибка при отправке координат:', error);
+        return null;
+      }
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error('Произошла ошибка:', error);
+      return null;
+    }
+}
+
+    ymaps.ready(function () {
+        var map = new ymaps.Map("map", {
+            center: [55.76, 37.64],
+            zoom: 3,
+            controls: ["zoomControl", "searchControl"]
+        });
+
+        var locations = {{ data["loc"] | tojson  }}; // Список местоположений
+        var connectionTypes = {{ data["typic"] | tojson  }}; // Список типов связи (car или poliline)
+        connectionTypes.pop(); // удалили последний ненужный тип передвижения
+        var coordinates = [];
+        var validator = [];
+        let count;
+
+        function geocodeLocation(location) {
+            return new Promise(function(resolve, reject) {
+                var geocoder = ymaps.geocode(location);
+                geocoder.then(function(res) {
+                    var geoObject = res.geoObjects.get(0);
+                    if (geoObject) {
+                        var coords = geoObject.geometry.getCoordinates();
+                        resolve(coords);
+                    } else {
+                        reject("Не удалось получить координаты для " + location);
+                    }
+                }).catch(function(err) {
+                    reject("Ошибка геокодирования для адреса: " + location + ", " + err);
+                });
+            });
+        }
+
+        var promiseChain = Promise.resolve();
+        locations.forEach(function(location) {
+            promiseChain = promiseChain
+                .then(function() {
+                    return geocodeLocation(location);
+                })
+                .then(function(coords) {
+                    coordinates.push(coords);
+                    validator.push(coords);
+                    var placemark = new ymaps.Placemark(coords, {
+                        balloonContent: location
+                    });
+                    map.geoObjects.add(placemark);
+                })
+                .catch(function(err) {
+                    console.error(err);
+                    validator.push(0);
+                });
+        });
+
+        promiseChain.then(function() {
+            if (coordinates.length > 1) {
+                for (var i = 0; i < coordinates.length - 1; i++) {
+                    var startPoint = coordinates[i];
+                    var endPoint = coordinates[i + 1];
+                    var connectionType = connectionTypes[i];
+                    if (startPoint && endPoint) {
+                        if (connectionType === "car") {
+                            createCarRoute(startPoint, endPoint);
+                        } else if (connectionType === "poliline") {
+                            drawPolyline(startPoint, endPoint);
+                        }
+                    } else {
+                        console.error("Невозможно построить маршрут, так как одна из точек не имеет координат.");
+                    }
+                }
+            } else {
+                console.error("Недостаточно точек для построения маршрута");
+            }
+        });
+        function createCarRoute(startPoint, endPoint) {
+            let cnt = 0;
+            if (startPoint && endPoint) {
+                var multiRoute = new ymaps.multiRouter.MultiRoute({
+                    referencePoints: [startPoint, endPoint],
+                    params: {
+                        routingMode: 'auto'
+                    }
+                }, {
+                    boundsAutoApply: true
+                });
+
+                map.geoObjects.add(multiRoute);
+                multiRoute.model.events.add('requestsuccess',function(){
+                    let route = multiRoute.getActiveRoute();
+                    try{
+                        const dis = route.properties.get("distance").value;
+                    }
+                    catch(error){
+                        drawPolyline(startPoint, endPoint);
+                    }
+
+                });
+            } else {
+                console.error("Невозможно построить маршрут, так как одна из точек не имеет координат.");
+            }
+        }
+
+
+        function drawPolyline(startPoint, endPoint) {
+            if (startPoint && endPoint) {
+                var polyline = new ymaps.Polyline(
+                    [startPoint, endPoint],
+                    {
+                        hintContent: 'Линия между точками'
+                    },
+                    {
+                        strokeColor: "#0000FF",
+                        strokeWidth: 4,
+                        strokeOpacity: 0.7
+                    }
+                );
+                map.geoObjects.add(polyline);
+            } else {
+                console.error("Невозможно построить полилинию, так как одна из точек не имеет координат.");
+            }
+        }
+        promiseChain.then(async function() {
+
+            for (let i = 0; i < validator.length; i++){
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                if (validator[i] == 0){
+                    console.log('error');
+                    let region_time = document.getElementById(`rater-${i}`);
+                    region_time.innerText = 'data by time not found';
+                }
+                else{
+                    get_data_by_region(validator[i][0],validator[i][1]).then(function(data){
+                        if (data.status == 'OK'){
+                            console.log('success');
+                            let region_time = document.getElementById(`rater-${i}`);
+                            region_time.innerText = `${spliter(data.formatted)}`;
+
+                        }
+
+                    });
+                }
+            }
+        });
+    });
+</script>
+<script src="/src/adapters/entrypoints/static/icao/rate.js"></script>
+<script src="/src/adapters/entrypoints/static/icao/timer.js"></script>

@@ -2,7 +2,7 @@ from fastapi import Request, HTTPException, status, Depends
 from jose import jwt, JWTError
 from datetime import datetime, timezone
 from src.configurator.config import get_auth_data
-from src.infrastructure.db.dao.users import UsersDAO
+from src.infrastructure.db.dao.users import UsersDAO, TripDao
 from src.infrastructure.db.database import User
 
 
@@ -83,3 +83,11 @@ async def get_current_admin_user(current_user: User = Depends(get_current_user))
     if current_user.role_id == 2:
         return current_user
     raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Недостаточно прав!')
+
+
+async def legal_way_for_user(user: User = Depends(get_current_user)):
+    trips = await TripDao.find_all_way_id(user_id=user.id)
+    if trips:
+        return trips
+    else:
+        return []
