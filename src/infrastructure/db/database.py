@@ -77,17 +77,18 @@ class WayParameter(Base):
     to: Mapped[str_null_true]
     out: Mapped[str_null_true]
     airto: Mapped[str_null_true]
-    airout:Mapped[str_null_true]
-    icao:Mapped[str_null_true]
-    icao1:Mapped[str_null_true]
-    hotel:Mapped[str_null_true]
-    price:Mapped[str_null_true]
+    airout: Mapped[str_null_true]
+    icao: Mapped[str_null_true]
+    icao1: Mapped[str_null_true]
+    hotel: Mapped[str_null_true]
+    price: Mapped[str_null_true]
     type: Mapped[str_null_true]
 
     way: Mapped["Way"] = relationship(back_populates="parameters")
 
     def __repr__(self):
         return f"{self.__class__.__name__}(id={self.id})"
+
 
 class Way(Base):
     id: Mapped[int_pk]
@@ -103,6 +104,5 @@ class Way(Base):
 class Airport:
     __tablename__ = 'icao'
 
-    country_code: Mapped[str_null_true]
     icao: Mapped[str_null_true]
-    name: Mapped[str_null_true]
+    airport: Mapped[str_null_true]
