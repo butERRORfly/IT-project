@@ -1,5 +1,6 @@
 let formCount = 0;
-let node = 0;
+// let node = 0; // Removed global 'node' variable
+
 async function convert(from, to, amount) {
   try {
     const response = await fetch(`https://api.frankfurter.dev/v1/latest?base=${from}&symbols=${to}`);
@@ -12,13 +13,26 @@ async function convert(from, to, amount) {
   }
 }
 
-
 function setupAutocomplete() {
-    const airportInputs = document.querySelectorAll('.airport-autocomplete');
+    const airportInputs = document.querySelectorAll('.name-autocomplete');
 
     airportInputs.forEach(input => {
-        const resultsId = input.id.replace('airport', 'airport-results');
+        // Remove old event listeners to prevent duplicates if setupAutocomplete is called multiple times
+        // A more robust way would be to use a marker or check if listener already exists,
+        // but for simplicity, let's assume this is sufficient or handle it via a wrapper if issues arise.
+        // Or, only call setupAutocomplete on newly added elements.
+        // For now, let's ensure we add listeners only once or manage them carefully.
+        // A simple flag can work:
+        if (input.dataset.autocompleteAttached) return;
+        input.dataset.autocompleteAttached = 'true';
+
+        const resultsId = input.id + '-results'; // Adjusted resultsId generation
         const resultsDiv = document.getElementById(resultsId);
+
+        if (!resultsDiv) {
+            console.error(`Results div not found for input ${input.id}: ${resultsId}`);
+            return;
+        }
 
         input.addEventListener('input', async function(e) {
             const query = e.target.value.trim();
@@ -56,8 +70,9 @@ function setupAutocomplete() {
                 resultsDiv.style.display = 'none';
             }
         });
+
         document.addEventListener('click', function(e) {
-            if (e.target !== input) {
+            if (e.target !== input && !resultsDiv.contains(e.target)) { // Ensure clicking on results doesn't hide it
                 resultsDiv.style.display = 'none';
             }
         });
@@ -72,10 +87,9 @@ function addForm() {
     const newFormContainer = document.createElement('div');
     newFormContainer.classList.add('form-container');
     newFormContainer.id = `form-container-${formCount}`;
+
     const pointFormItem = document.createElement('div');
-    pointFormItem.classList.add('form-item');
-    pointFormItem.classList.add('form');
-    pointFormItem.classList.add("name");
+    pointFormItem.classList.add('form-item', 'form', 'name');
     const pointLabel = document.createElement('label');
     pointLabel.setAttribute('for', `point-${formCount}`);
     pointLabel.textContent = `Название точки ${formCount}:`;
@@ -88,9 +102,7 @@ function addForm() {
     pointFormItem.appendChild(pointInput);
 
     const block = document.createElement('div');
-    block.classList.add("form");
-    block.classList.add('form-item');
-    block.classList.add("name");
+    block.classList.add("form", 'form-item', "name");
     const wayLabel = document.createElement('label');
     wayLabel.textContent = 'Транспорт отправления';
     const typeWay = document.createElement('select');
@@ -105,15 +117,12 @@ function addForm() {
     option2.textContent = 'poliline';
     typeWay.appendChild(option1);
     typeWay.appendChild(option2);
-    typeWay.value = 'poliline';
+    typeWay.value = 'poliline'; // Default to poliline
     block.appendChild(wayLabel);
     block.appendChild(typeWay);
 
-
     const dateFormItem = document.createElement('div');
-    dateFormItem.classList.add('form-item');
-    dateFormItem.classList.add('form');
-    dateFormItem.classList.add("name");
+    dateFormItem.classList.add('form-item', 'form', 'name');
     const dateLabel = document.createElement('label');
     dateLabel.setAttribute('for', `date_to-${formCount}`);
     dateLabel.textContent = `Дата прибытия ${formCount}:`;
@@ -125,9 +134,7 @@ function addForm() {
     dateFormItem.appendChild(dateInput);
 
     const dateFormItem1 = document.createElement('div');
-    dateFormItem1.classList.add('form-item');
-    dateFormItem1.classList.add("name");
-    dateFormItem1.classList.add('form');
+    dateFormItem1.classList.add('form-item', 'name', 'form');
     const dateOutLabel = document.createElement('label');
     dateOutLabel.setAttribute('for', `date_out-${formCount}`);
     dateOutLabel.textContent = `Дата отбытия ${formCount}:`;
@@ -140,9 +147,7 @@ function addForm() {
 
     const hotelFormItem = document.createElement('div');
     hotelFormItem.id = `hostel-${formCount}`;
-    hotelFormItem.classList.add('form-item');
-    hotelFormItem.classList.add("name");
-    hotelFormItem.classList.add('form');
+    hotelFormItem.classList.add('form-item', 'name', 'form');
     const hotelLabel = document.createElement('label');
     hotelLabel.setAttribute('for', `gost-${formCount}`);
     hotelLabel.textContent = `Гостиница ${formCount}:`;
@@ -153,73 +158,68 @@ function addForm() {
     hotelFormItem.appendChild(hotelLabel);
     hotelFormItem.appendChild(hotelInput);
 
-    const airPortFormItem = document.createElement('div');
-    airPortFormItem.id = `fly-${formCount}`;
-    airPortFormItem.classList.add('form-item');
-    airPortFormItem.classList.add('form');
-    airPortFormItem.classList.add("name");
-    const airPortLabel = document.createElement('label');
-    airPortLabel.setAttribute('for', `air-${formCount}`);
-    airPortLabel.textContent = `Аэропорт прилета:`;
-    const airPortInput = document.createElement('input');
-    airPortInput.type = 'text';
-    airPortInput.id = `air-${formCount}`;
-    airPortInput.name = `air-${formCount}`;
-    airPortFormItem.appendChild(airPortLabel);
-    airPortFormItem.appendChild(airPortInput);
+    // Arrival Airport (single autocomplete field) - only for formCount > 0
+    let arrivalAirportItem;
+    if (formCount > 0) {
+        arrivalAirportItem = document.createElement('div');
+        arrivalAirportItem.id = `arrival-airport-item-${formCount}`;
+        arrivalAirportItem.classList.add('form-item', 'form', 'name');
 
-    const icaoFormItem = document.createElement('div');
-    icaoFormItem.id = `table-${formCount}`;
-    icaoFormItem.classList.add('form-item');
-    icaoFormItem.classList.add("name");
-    icaoFormItem.classList.add("form");
-    const icaoLabel = document.createElement('label');
-    icaoLabel.setAttribute('for', `icao-${formCount}`);
-    icaoLabel.textContent = `ICAO код `;
-    const icaoInput = document.createElement('input');
-    icaoInput.type = 'text';
-    icaoInput.id = `icao-${formCount}`;
-    icaoInput.name = `icao-${formCount}`;
-    icaoFormItem.appendChild(icaoLabel);
-    icaoFormItem.appendChild(icaoInput);
-    const airPortFormItem2 = document.createElement('div');
-    airPortFormItem2.id = `fly1-${formCount}`;
-    airPortFormItem2.classList.add('form-item');
-    airPortFormItem2.classList.add('form');
-    airPortFormItem2.classList.add("name");
-    const airPortLabel2 = document.createElement('label');
-    airPortLabel2.setAttribute('for', `air2-${formCount}`);
-    airPortLabel2.textContent = `Аэропорт вылета:`;
-    const airPortInput2 = document.createElement('input');
-    airPortInput2.type = 'text';
-    airPortInput2.id = `air2-${formCount}`;
-    airPortInput2.name = `air2-${formCount}`;
-    airPortFormItem2.appendChild(airPortLabel2);
-    airPortFormItem2.appendChild(airPortInput2);
+        const arrivalAirportLabel = document.createElement('label');
+        arrivalAirportLabel.setAttribute('for', `airport-arrival-${formCount}`);
+        arrivalAirportLabel.textContent = `Аэропорт прилета (название или ICAO):`;
+        const arrivalAirportInput = document.createElement('input');
+        arrivalAirportInput.type = 'text';
+        arrivalAirportInput.id = `airport-arrival-${formCount}`;
+        arrivalAirportInput.name = `airport-arrival-${formCount}`;
+        arrivalAirportInput.classList.add('form', 'name-autocomplete');
+        arrivalAirportInput.placeholder = "Название или ICAO";
+        arrivalAirportInput.autocomplete = 'off';
+        const arrivalAirportResultsDiv = document.createElement('div');
+        arrivalAirportResultsDiv.classList.add('autocomplete-results');
+        arrivalAirportResultsDiv.id = `airport-arrival-${formCount}-results`;
 
+        arrivalAirportItem.appendChild(arrivalAirportLabel);
+        arrivalAirportItem.appendChild(arrivalAirportInput);
+        arrivalAirportItem.appendChild(arrivalAirportResultsDiv);
 
+        // Set initial visibility based on previous form's transport type
+        const prevFormIndex = formCount - 1;
+        const prevTypeWayElement = document.getElementById(`type_way-${prevFormIndex}`);
+        if (prevTypeWayElement && prevTypeWayElement.value === 'car') {
+            arrivalAirportItem.style.display = 'none';
+        } else {
+            arrivalAirportItem.style.display = 'block'; // Or 'flex', or remove to use CSS default
+        }
+    }
 
-    const icaoFormItem2 = document.createElement('div');
-    icaoFormItem2.id = `table1-${formCount}`;
-    icaoFormItem2.classList.add('form-item');
-    icaoFormItem2.classList.add("name");
-    icaoFormItem2.classList.add("form");
-    const icaoLabel2 = document.createElement('label');
-    icaoLabel2.setAttribute('for', `icao2-${formCount}`);
-    icaoLabel2.textContent = `ICAO`;
-    const icaoInput2 = document.createElement('input');
-    icaoInput2.type = 'text';
-    icaoInput2.id = `icao2-${formCount}`;
-    icaoInput2.name = `icao2-${formCount}`;
-    icaoFormItem2.appendChild(icaoLabel2);
-    icaoFormItem2.appendChild(icaoInput2);
+    // Departure Airport (single autocomplete field)
+    const departureAirportItem = document.createElement('div');
+    departureAirportItem.id = `departure-airport-item-${formCount}`;
+    departureAirportItem.classList.add('form-item', 'form', 'name');
+    departureAirportItem.style.display = 'block'; // Default visible if poliline is default for this form
 
+    const departureAirportLabel = document.createElement('label');
+    departureAirportLabel.setAttribute('for', `airport-departure-${formCount}`);
+    departureAirportLabel.textContent = `Аэропорт вылета (название или ICAO):`;
+    const departureAirportInput = document.createElement('input');
+    departureAirportInput.type = 'text';
+    departureAirportInput.id = `airport-departure-${formCount}`;
+    departureAirportInput.name = `airport-departure-${formCount}`;
+    departureAirportInput.classList.add('form', 'name-autocomplete');
+    departureAirportInput.placeholder = "Название или ICAO";
+    departureAirportInput.autocomplete = 'off';
+    const departureAirportResultsDiv = document.createElement('div');
+    departureAirportResultsDiv.classList.add('autocomplete-results');
+    departureAirportResultsDiv.id = `airport-departure-${formCount}-results`;
+
+    departureAirportItem.appendChild(departureAirportLabel);
+    departureAirportItem.appendChild(departureAirportInput);
+    departureAirportItem.appendChild(departureAirportResultsDiv);
 
 
     const priceFormItem = document.createElement('div');
-    priceFormItem.classList.add('form-item');
-    priceFormItem.classList.add('form');
-    priceFormItem.classList.add("name");
+    priceFormItem.classList.add('form-item', 'form', 'name');
     const priceLabel = document.createElement('label');
     priceLabel.setAttribute('for', `cost-${formCount}`);
     priceLabel.textContent = `Цена посещения за точку `;
@@ -227,14 +227,12 @@ function addForm() {
     priceInput.type = 'number';
     priceInput.id = `cost-${formCount}`;
     priceInput.name = `cost-${formCount}`;
+    priceInput.required = true;
     priceFormItem.appendChild(priceLabel);
     priceFormItem.appendChild(priceInput);
-    priceInput.required = true;
 
     const rate = document.createElement('div');
-    rate.classList.add('form-item');
-    rate.classList.add('form');
-    rate.classList.add("name");
+    rate.classList.add('form-item', 'form', 'name');
     const rateLabel = document.createElement('label');
     rateLabel.setAttribute('for', `rate-${formCount}`);
     rateLabel.textContent = `Расчетная валюта `;
@@ -246,82 +244,127 @@ function addForm() {
     rate.appendChild(VAL);
 
     const delete_block = document.createElement('button');
-    delete_block.classList.add('form-item');
-    delete_block.classList.add('delete-btn');
+    delete_block.classList.add('form-item', 'delete-btn');
     delete_block.id = `deleter-${formCount}`;
     delete_block.textContent = `Удалить точку`;
     delete_block.addEventListener('click', (event) => {
-            delete_point(event, formCount);
+        delete_point(event, formCount); // Pass the correct ID for deletion
     });
 
-
-
     newFormContainer.appendChild(pointFormItem);
-    newFormContainer.appendChild(block);
-    newFormContainer.appendChild(dateFormItem);
-    newFormContainer.appendChild(dateFormItem1);
+    newFormContainer.appendChild(block); // type_way
+    newFormContainer.appendChild(dateFormItem); // date_to
+    newFormContainer.appendChild(dateFormItem1); // date_out
     newFormContainer.appendChild(hotelFormItem);
-    if (node===0){
-    newFormContainer.appendChild(airPortFormItem);
-    newFormContainer.appendChild(icaoFormItem);
+    if (arrivalAirportItem) {
+        newFormContainer.appendChild(arrivalAirportItem);
     }
-    node = 0;
-    newFormContainer.appendChild(airPortFormItem2);
-    newFormContainer.appendChild(icaoFormItem2);
+    newFormContainer.appendChild(departureAirportItem);
     newFormContainer.appendChild(priceFormItem);
     newFormContainer.appendChild(rate);
     newFormContainer.appendChild(delete_block);
 
     document.getElementById('form-wrapper').insertBefore(newFormContainer, document.querySelector('.add-button'));
-    add_cur();
+    add_cur(); // Populates currency dropdown
+    setupAutocomplete(); // Setup autocomplete for the new form's inputs
+}
+
+function parseAirportString(airportString) {
+    if (!airportString || airportString.trim() === '' || airportString === '!') {
+        return { name: '!', icao: '!' };
+    }
+    const match = airportString.match(/(.*) \(([^)]+)\)$/);
+    if (match && match.length === 3) {
+        return { name: match[1].trim(), icao: match[2].trim().toUpperCase() };
+    }
+    // Fallback: if it looks like an ICAO code (3-4 uppercase letters/digits)
+    if (airportString.length >= 3 && airportString.length <= 4 && airportString === airportString.toUpperCase() && /^[A-Z0-9]+$/.test(airportString)) {
+        return { name: '!', icao: airportString.trim() };
+    }
+    // Default to name if not parsable otherwise
+    return { name: airportString.trim(), icao: '!' };
 }
 
 async function submitData() {
     try {
         const formsData = [];
-        for (let i = 0; i <= formCount; i++) {
-            const point = document.getElementById(`point-${i}`).value;
+        // Iterate over existing form containers to handle deletions correctly
+        const formContainers = document.querySelectorAll('.form-container[id^="form-container-"]');
+
+        for (const formContainer of formContainers) {
+            const idMatch = formContainer.id.match(/form-container-(\d+)/);
+            if (!idMatch) continue;
+            const i = idMatch[1]; // Get the index from the container's ID
+
+            const pointElement = document.getElementById(`point-${i}`);
+            if (!pointElement) continue; // Skip if essential elements are missing (form might be malformed/deleted)
+            const point = pointElement.value;
+
             const dateElement = document.getElementById(`date_to-${i}`);
             const date_to = dateElement ? dateElement.value : '!';
 
-            const date_out = document.getElementById(`date_out-${i}`).value;
-            const gost = document.getElementById(`gost-${i}`).value;
+            const dateOutElement = document.getElementById(`date_out-${i}`);
+            const date_out = dateOutElement ? dateOutElement.value : '!';
 
-            const icaoElement = document.getElementById(`icao-${i}`);
-            const icao = icaoElement ? icaoElement.value : '!';
+            const gostElement = document.getElementById(`gost-${i}`);
+            const gost = gostElement ? gostElement.value : '!';
 
-            const airElement = document.getElementById(`air-${i}`);
-            const air = airElement ? airElement.value : '!';
+            let air = '!', icao = '!', air2 = '!', icao2 = '!';
 
-            const icao2Element = document.getElementById(`icao2-${i}`);
-            const icao2 = icao2Element ? icao2Element.value : '!';
-
-            const air2Element = document.getElementById(`air2-${i}`);
-            const air2 = air2Element ? air2Element.value : '!';
-
-            const typic = document.getElementById(`type_way-${i}`).value;
-            let cost = document.getElementById(`cost-${i}`).value;
-            const rate = document.getElementById(`rate-${i}`).value;
-            const cost_for_usd = cost;
-            cost = (cost+'-'+rate).toUpperCase();
-            console.log(rate);
-            if (rate.toUpperCase() == 'USD'){
-                const convertedRate = cost_for_usd;
-                formsData.push({ point, date_to, date_out, gost, air, icao, air2, icao2, convertedRate, cost, typic});
+            // Arrival Airport (relevant for i > 0 conceptually, but check element existence and visibility)
+            const arrivalAirportInputElement = document.getElementById(`airport-arrival-${i}`);
+            const arrivalAirportItemElement = document.getElementById(`arrival-airport-item-${i}`);
+            if (arrivalAirportInputElement && arrivalAirportItemElement && arrivalAirportItemElement.style.display !== 'none') {
+                const parsed = parseAirportString(arrivalAirportInputElement.value);
+                air = parsed.name;
+                icao = parsed.icao;
             }
-            else{
-                const convertedRate = await convert(rate.toUpperCase(), 'USD', parseInt(cost));
-                console.log(convertedRate);
-                formsData.push({ point, date_to, date_out, gost, air, icao, air2, icao2, convertedRate, cost, typic });
+
+            // Departure Airport
+            const departureAirportInputElement = document.getElementById(`airport-departure-${i}`);
+            const departureAirportItemElement = document.getElementById(`departure-airport-item-${i}`);
+            if (departureAirportInputElement && departureAirportItemElement && departureAirportItemElement.style.display !== 'none') {
+                const parsed = parseAirportString(departureAirportInputElement.value);
+                air2 = parsed.name;
+                icao2 = parsed.icao;
             }
+
+            const typicElement = document.getElementById(`type_way-${i}`);
+            const typic = typicElement ? typicElement.value : 'poliline';
+
+            const costElement = document.getElementById(`cost-${i}`);
+            let cost = costElement ? costElement.value : '0';
+
+            const rateElement = document.getElementById(`rate-${i}`);
+            const rate = rateElement ? rateElement.value : 'USD';
+
+            const cost_for_usd = parseFloat(cost) || 0; // Ensure cost is a number for conversion
+            let cost_string = `${cost_for_usd}-${rate.toUpperCase()}`; // Keep original cost string format
+
+            let convertedRateVal;
+            if (rate.toUpperCase() === 'USD') {
+                convertedRateVal = cost_for_usd.toFixed(2);
+            } else {
+                convertedRateVal = await convert(rate.toUpperCase(), 'USD', cost_for_usd);
+                if (convertedRateVal === null) convertedRateVal = 'Error'; // Handle conversion error
+            }
+            formsData.push({ point, date_to, date_out, gost, air, icao, air2, icao2, convertedRate: convertedRateVal, cost: cost_string, typic });
         }
 
+
         console.log("Отправляемые данные:", formsData);
+        if (formsData.length === 0 && formCount >=0) { // Check if initial form had issues or no forms submitted
+             const initialFormExists = document.getElementById('form-container-0');
+             if (!initialFormExists || !document.getElementById('point-0')) {
+                 alert("Нет данных для отправки. Пожалуйста, заполните хотя бы одну точку.");
+                 return;
+             }
+        }
+
+
         const response = await fetch('http://127.0.0.1:8000/submit', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(formsData)
         });
 
@@ -341,161 +384,119 @@ async function submitData() {
         alert('Ошибка сети или сервера.');
     }
 }
-function delete_point(event,id){
-    let point_to_delete = document.getElementById(`form-container-${id}`);
-    point_to_delete.remove();
-    formCount = formCount-1;
+
+function delete_point(event, id_to_delete) {
+    // id_to_delete is the index part of the id, e.g., 1 from form-container-1
+    let point_to_delete = document.getElementById(`form-container-${id_to_delete}`);
+    if (point_to_delete) {
+        point_to_delete.remove();
+        // Note: formCount is not strictly decremented here as it represents the max index ever reached.
+        // The submitData iterates through existing forms, so gaps are handled.
+        // If you need to strictly manage formCount as "current number of forms", more logic is needed
+        // for re-indexing or managing a list of active form IDs.
+        // For now, this just removes the element.
+
+        // After deleting point `k`, we might need to update visibility of airport fields
+        // for point `k-1` (its departure) and point `k+1` (its arrival).
+        // This can get complex. For simplicity, let's assume the user will manually adjust
+        // transport types if needed, or this behavior is acceptable.
+        // A full re-evaluation of linked airport visibilities would be:
+        const prevFormIndex = parseInt(id_to_delete, 10) - 1;
+        const nextFormIndex = parseInt(id_to_delete, 10) + 1; // This was the old k+1
+
+        // If form k-1 exists, its type_way now dictates arrival to what was form k+1 (now effectively form k)
+        const prevTypeWayElement = document.getElementById(`type_way-${prevFormIndex}`);
+        const nextArrivalAirportItem = document.getElementById(`arrival-airport-item-${nextFormIndex}`); // This ID might now belong to a re-indexed form or a new form with this index
+
+        if (prevTypeWayElement && nextArrivalAirportItem) {
+            if (prevTypeWayElement.value === 'car') {
+                nextArrivalAirportItem.style.display = 'none';
+            } else {
+                nextArrivalAirportItem.style.display = 'block';
+            }
+        }
+    }
 }
+
 
 function add_cur(){
     const currencies = [
-  { "code": "AUD", "name": "Australian Dollar" },
-  { "code": "BGN", "name": "Bulgarian Lev" },
-  { "code": "BRL", "name": "Brazilian Real" },
-  { "code": "CAD", "name": "Canadian Dollar" },
-  { "code": "CHF", "name": "Swiss Franc" },
-  { "code": "CNY", "name": "Chinese Yuan" },
-  { "code": "CZK", "name": "Czech Koruna" },
-  { "code": "DKK", "name": "Danish Krone" },
-  { "code": "EUR", "name": "Euro" },
-  { "code": "GBP", "name": "British Pound Sterling" },
-  { "code": "HKD", "name": "Hong Kong Dollar" },
-  { "code": "HUF", "name": "Hungarian Forint" },
-  { "code": "IDR", "name": "Indonesian Rupiah" },
-  { "code": "ILS", "name": "Israeli New Shekel" },
-  { "code": "INR", "name": "Indian Rupee" },
-  { "code": "ISK", "name": "Icelandic Krona" },
-  { "code": "JPY", "name": "Japanese Yen" },
-  { "code": "KRW", "name": "South Korean Won" },
-  { "code": "MXN", "name": "Mexican Peso" },
-  { "code": "MYR", "name": "Malaysian Ringgit" },
-  { "code": "NOK", "name": "Norwegian Krone" },
-  { "code": "NZD", "name": "New Zealand Dollar" },
-  { "code": "PHP", "name": "Philippine Peso" },
-  { "code": "PLN", "name": "Polish Zloty" },
-  { "code": "RON", "name": "Romanian Leu" },
-  { "code": "SEK", "name": "Swedish Krona" },
-  { "code": "SGD", "name": "Singapore Dollar" },
-  { "code": "THB", "name": "Thai Baht" },
-  { "code": "TRY", "name": "Turkish Lira" },
-  { "code": "USD", "name": "United States Dollar" },
-  { "code": "ZAR", "name": "South African Rand" }
-  ];
-  const select = document.getElementById(`rate-${formCount}`);
-  for (let i = 0; i < currencies.length; i++) {
-    const option = document.createElement('option');
-    option.value = currencies[i].code;
-    option.textContent = currencies[i].name;
-    select.appendChild(option);
-  }
-  select.value = "USD";
+      { "code": "AUD", "name": "Australian Dollar" }, { "code": "BGN", "name": "Bulgarian Lev" },
+      { "code": "BRL", "name": "Brazilian Real" }, { "code": "CAD", "name": "Canadian Dollar" },
+      { "code": "CHF", "name": "Swiss Franc" }, { "code": "CNY", "name": "Chinese Yuan" },
+      { "code": "CZK", "name": "Czech Koruna" }, { "code": "DKK", "name": "Danish Krone" },
+      { "code": "EUR", "name": "Euro" }, { "code": "GBP", "name": "British Pound Sterling" },
+      { "code": "HKD", "name": "Hong Kong Dollar" }, { "code": "HUF", "name": "Hungarian Forint" },
+      { "code": "IDR", "name": "Indonesian Rupiah" }, { "code": "ILS", "name": "Israeli New Shekel" },
+      { "code": "INR", "name": "Indian Rupee" }, { "code": "ISK", "name": "Icelandic Krona" },
+      { "code": "JPY", "name": "Japanese Yen" }, { "code": "KRW", "name": "South Korean Won" },
+      { "code": "MXN", "name": "Mexican Peso" }, { "code": "MYR", "name": "Malaysian Ringgit" },
+      { "code": "NOK", "name": "Norwegian Krone" }, { "code": "NZD", "name": "New Zealand Dollar" },
+      { "code": "PHP", "name": "Philippine Peso" }, { "code": "PLN", "name": "Polish Zloty" },
+      { "code": "RON", "name": "Romanian Leu" }, { "code": "SEK", "name": "Swedish Krona" },
+      { "code": "SGD", "name": "Singapore Dollar" }, { "code": "THB", "name": "Thai Baht" },
+      { "code": "TRY", "name": "Turkish Lira" }, { "code": "USD", "name": "United States Dollar" },
+      { "code": "ZAR", "name": "South African Rand" }
+    ];
+    // Apply to current formCount (newly added) or form 0 if it's the initial call
+    const currentFormIndex = (formCount === 0 && !document.getElementById(`rate-${formCount}`)) ? 0 : formCount;
+    const select = document.getElementById(`rate-${currentFormIndex}`);
+    if (select) {
+        // Clear existing options if any, except if it's the initial population for form 0
+        if (select.options.length > 0 && currentFormIndex !== 0) { // Avoid clearing form 0 if add_cur is called multiple times initially
+            // Or simply check if already populated
+            if (select.dataset.populated) return;
+        }
+        for (let i = 0; i < currencies.length; i++) {
+            const option = document.createElement('option');
+            option.value = currencies[i].code;
+            option.textContent = currencies[i].name;
+            select.appendChild(option);
+        }
+        select.value = "USD";
+        select.dataset.populated = "true";
+    }
 }
 
 function valid(value) {
-    return /^[1-9]\d*$/.test(value);
+    return /^[1-9]\d*$/.test(value) || value === ''; // Allow empty for temporary input
 }
 document.addEventListener('input', function(event) {
     const target = event.target;
-    if (target.tagName === 'INPUT' && /^cost-\d+$/.test(target.id)) {
-      if (!valid(target.value)) {
-        target.value = '';
+    if (target.tagName === 'INPUT' && target.type === 'number' && /^cost-\d+$/.test(target.id)) {
+      if (!valid(target.value) && target.value !== '') { // Allow clearing the input
+        target.value = target.value.slice(0, -1); // Simple way to remove last invalid char
       }
     }
 });
 
-function destroy(selectId){
-    node = 1;
-    if (parseInt(selectId,10) === 0){
-        console.log(`fly1-${selectId}`);
-        document.getElementById(`fly1-${selectId}`).remove();
-        document.getElementById(`table1-${selectId}`).remove();
-        if (formCount >= parseInt(selectId,10)){
-            document.getElementById(`fly-${parseInt(selectId,10)+1}`).remove();
-            document.getElementById(`table-${parseInt(selectId,10)+1}`).remove();
-        }
+function destroy(selectId) { // Called when 'car' is selected for form 'selectId'
+    const currentFormIndex = parseInt(selectId, 10);
+
+    const departureAirportItemCurrent = document.getElementById(`departure-airport-item-${currentFormIndex}`);
+    if (departureAirportItemCurrent) {
+        departureAirportItemCurrent.style.display = 'none';
     }
-    if (parseInt(selectId,10) > 0){
-        document.getElementById(`fly1-${selectId}`).remove();
-        document.getElementById(`table1-${selectId}`).remove();
-        if (formCount > parseInt(selectId,10)){
-            document.getElementById(`fly-${parseInt(selectId,10)+1}`).remove();
-            document.getElementById(`table-${parseInt(selectId,10)+1}`).remove();
-        }
+
+    const nextFormIndex = currentFormIndex + 1;
+    const arrivalAirportItemNext = document.getElementById(`arrival-airport-item-${nextFormIndex}`);
+    if (arrivalAirportItemNext) {
+        arrivalAirportItemNext.style.display = 'none';
     }
 }
-function append(selectId){
-    node = 0;
-    if (parseInt(selectId,10) > -1){
-        let airPortFormItem2 = document.createElement('div');
-        airPortFormItem2.id = `fly1-${parseInt(selectId,10)}`;
-        airPortFormItem2.classList.add('form-item');
-        airPortFormItem2.classList.add('form');
-        airPortFormItem2.classList.add("name");
-        const airPortLabel2 = document.createElement('label');
-        airPortLabel2.setAttribute('for', `air-${parseInt(selectId,10)}`);
-        airPortLabel2.textContent = `Аэропорт вылета:`;
-        let airPortInput2 = document.createElement('input');
-        airPortInput2.type = 'text';
-        airPortInput2.id = `air2-${parseInt(selectId,10)}`;
-        airPortInput2.name = `air2-${parseInt(selectId,10)}`;
-        airPortFormItem2.appendChild(airPortLabel2);
-        airPortFormItem2.appendChild(airPortInput2);
 
-        let icaoFormItem2 = document.createElement('div');
-        icaoFormItem2.id = `table1-${parseInt(selectId,10)}`;
-        icaoFormItem2.classList.add('form-item');
-        icaoFormItem2.classList.add("name");
-        icaoFormItem2.classList.add("form");
-        const icaoLabel2 = document.createElement('label');
-        icaoLabel2.setAttribute('for', `icao-${parseInt(selectId,10)}`);
-        icaoLabel2.textContent = `ICAO `;
-        const icaoInput2 = document.createElement('input');
-        icaoInput2.type = 'text';
-        icaoInput2.id = `icao2-${parseInt(selectId,10)}`;
-        icaoInput2.name = `icao2-${parseInt(selectId,10)}`;
-        icaoFormItem2.appendChild(icaoLabel2);
-        icaoFormItem2.appendChild(icaoInput2);
-        let h = document.getElementById(`hostel-${parseInt(selectId,10)}`);
-        h.parentNode.insertBefore(airPortFormItem2,h.nextSibling);
-        airPortFormItem2.parentNode.insertBefore(icaoFormItem2,airPortFormItem2.nextSibling);
+function append(selectId) { // Called when 'poliline' is selected for form 'selectId'
+    const currentFormIndex = parseInt(selectId, 10);
 
-        if (formCount >parseInt(selectId,10)){
-        let load = parseInt(selectId,10) +1;
-        const airPortFormItem = document.createElement('div');
-        airPortFormItem.id = `fly-${load}`;
-        airPortFormItem.classList.add('form-item');
-        airPortFormItem.classList.add('form');
-        airPortFormItem.classList.add("name");
-        const airPortLabel = document.createElement('label');
-        airPortLabel.setAttribute('for', `air-${load}`);
-        airPortLabel.textContent = `Аэропорт прилета:`;
-        const airPortInput = document.createElement('input');
-        airPortInput.type = 'text';
-        airPortInput.id = `air-${load}`;
-        airPortInput.name = `air-${load}`;
-        airPortFormItem.appendChild(airPortLabel);
-        airPortFormItem.appendChild(airPortInput);
+    const departureAirportItemCurrent = document.getElementById(`departure-airport-item-${currentFormIndex}`);
+    if (departureAirportItemCurrent) {
+        departureAirportItemCurrent.style.display = 'block'; // Or 'flex' or use CSS class
+    }
 
-        const icaoFormItem = document.createElement('div');
-        icaoFormItem.id = `table-${load}`;
-        icaoFormItem.classList.add('form-item');
-        icaoFormItem.classList.add("name");
-        icaoFormItem.classList.add("form");
-        const icaoLabel = document.createElement('label');
-        icaoLabel.setAttribute('for', `icao-${load}`);
-        icaoLabel.textContent = `ICAO код `;
-        const icaoInput = document.createElement('input');
-        icaoInput.type = 'text';
-        icaoInput.id = `icao-${load}`;
-        icaoInput.name = `icao-${load}`;
-        icaoFormItem.appendChild(icaoLabel);
-        icaoFormItem.appendChild(icaoInput);
-
-        const h1 = document.getElementById(`hostel-${parseInt(load,10)}`);
-
-        h1.parentNode.insertBefore(airPortFormItem,h1.nextSibling);
-        airPortFormItem.parentNode.insertBefore(icaoFormItem,airPortFormItem.nextSibling);
-        }
+    const nextFormIndex = currentFormIndex + 1;
+    const arrivalAirportItemNext = document.getElementById(`arrival-airport-item-${nextFormIndex}`);
+    if (arrivalAirportItemNext) {
+        arrivalAirportItemNext.style.display = 'block'; // Or 'flex'
     }
 }
 
@@ -510,8 +511,19 @@ document.addEventListener('change', function(event) {
       else if (val === 'poliline'){
         append(selectId);
       }
-
     }
 });
 
-add_cur()
+// Initial call for form 0 currencies
+document.addEventListener('DOMContentLoaded', () => {
+    add_cur(); // For form-0
+    // Check initial transport type for form-0 and set airport visibility if needed
+    const initialTypeWay = document.getElementById('type_way-0');
+    if (initialTypeWay) {
+        if (initialTypeWay.value === 'car') {
+            destroy('0');
+        } else {
+            append('0'); // Ensures visibility is correct on load
+        }
+    }
+});

@@ -175,9 +175,12 @@ async def receive_coordinates(payload: CoordinatesPayload) -> dict:
 
 
 @rout.get("/airports/search", response_model=List[AirportD])
-async def search_airports(request: Request, query: str):
+async def search_airports(query: str):
     try:
+        if len(query) < 2:
+            return []
         airports = await AirportDAO.find_airports(query)
         return airports
-    except Exception:
-        raise HTTPException(status_code=404, detail="Airports not found")
+    except Exception as e:
+        print(f"Search error: {str(e)}")
+        raise HTTPException(status_code=500, detail="Internal server error")

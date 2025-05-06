@@ -101,8 +101,12 @@ class Way(Base):
         return f"{self.__class__.__name__}(id={self.id}, user_id={self.user_id})"
 
 
-class Airport:
+class Airport(Base):
     __tablename__ = 'icao'
+    __mapper_args__ = {'exclude_properties': ['created_at', 'updated_at']}
 
-    icao: Mapped[str_null_true]
-    airport: Mapped[str_null_true]
+    icao: Mapped[str] = mapped_column(String(4), primary_key=True)
+    name: Mapped[str] = mapped_column(String(255))
+
+    def __repr__(self):
+        return f"Airport(icao={self.icao}, name={self.name})"

@@ -25,14 +25,14 @@ def upgrade():
     op.create_table(
         'icao',
         sa.Column('icao', sa.String(50), nullable=True),
-        sa.Column('airport', sa.String(128), nullable=True),
+        sa.Column('name', sa.String(128), nullable=True),
         schema='public'
     )
 
     csv_path = os.path.join(os.path.dirname(__file__), "..", 'data', 'icao.csv')
 
     with open(csv_path, mode='r', encoding='utf-8') as f:
-        reader = csv.DictReader(f, delimiter=';', fieldnames=['icao', 'airport'])
+        reader = csv.DictReader(f, delimiter=';', fieldnames=['icao', 'name'])
         rows = [dict(row) for row in reader]
 
         if rows:
@@ -40,7 +40,7 @@ def upgrade():
                 sa.table(
                     'icao',
                     sa.column('icao'),
-                    sa.column('airport')
+                    sa.column('name')
                 ),
                 rows
             )
