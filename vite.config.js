@@ -11,7 +11,7 @@ export default defineConfig({
         // Можно добавить ещё шаблонов
       },
       output: {
-        entryFileNames: 'bundle-[name].js',  // Итоговые файлы
+        entryFileNames: 'bundle-[query].js',  // Итоговые файлы
         format: 'esm',
         dir: 'static',  // Папка для бандлов
       },

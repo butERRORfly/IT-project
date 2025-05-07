@@ -1,23 +1,19 @@
-from fastapi import APIRouter, HTTPException, status, Response, Depends
-from starlette.requests import Request
-from starlette.responses import RedirectResponse
-from typing import List, Optional
-from src.adapters.entrypoints.utilities.auth import get_password_hash, create_access_token, authenticate_user
-from fastapi.responses import HTMLResponse, JSONResponse
-from fastapi import FastAPI, Form
-from typing import List
-from fastapi.templating import Jinja2Templates
-from src.infrastructure.db.database import User
-from src.domain.schemas.users import UserRegister, UserAuth, UserChangeRole
-from src.adapters.entrypoints.utilities.dependencies import get_current_user, get_current_admin_user, legal_way_for_user
-from pydantic import BaseModel
-import requests
 from datetime import datetime
-from src.infrastructure.db.dao.users import UsersDAO, TripDao
-from src.infrastructure.db.dao.airport import AirportDAO
-from src.infrastructure.db.database import User
+from typing import List
+from typing import Optional
+
 import requests
+from fastapi import APIRouter, HTTPException, status, Depends
 from fastapi import Query
+from fastapi.responses import HTMLResponse
+from fastapi.templating import Jinja2Templates
+from pydantic import BaseModel
+from starlette.requests import Request
+
+from src.adapters.entrypoints.utilities.dependencies import get_current_user, legal_way_for_user
+from src.infrastructure.db.dao.airport import AirportDAO
+from src.infrastructure.db.dao.trip import TripDao
+from src.infrastructure.db.database import User
 
 rout = APIRouter()
 templates = Jinja2Templates(directory="src/adapters/entrypoints/templates")
@@ -39,10 +35,9 @@ async def return_page(
 
 @rout.get("/icao/airport", response_model=List[dict], summary="Поиск аэропорта/ICAO кода")
 async def search_airports(
-        name: Optional[str] = Query(None, min_length=2, description="Search term for airport name or ICAO code"),
+        name: Optional[str] = Query(None, min_length=2, description="Search term for airport query or ICAO code"),
         limit: int = Query(5, ge=1, le=20, description="Maximum number of results to return"),
-        user: User = Depends(get_current_user)
-):
+        user: User = Depends(get_current_user)):
     if len(name) < 2:
         return []
 
@@ -170,7 +165,7 @@ async def submit_data(request: Request, forms: List[FormData], user: User = Depe
 async def save_users_route(request: Request, forms: List[RouteData], user: User = Depends(get_current_user)) -> dict:
     personal_way = await TripDao.add_way(user_id=user.id)
     if personal_way is not None:
-        trip = await TripDao.add_point_way(way_id=personal_way.id, data=[route.dict() for route in forms])
+        trip = await TripDao.add_point_way(way_id=personal_way.id, data=[route.model_dump() for route in forms])
         if trip is not None:
             print('way was saved')
             return {'message': 'Was was sucesseful saved!'}

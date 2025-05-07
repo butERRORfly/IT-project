@@ -80,7 +80,7 @@
 <!--        // Функция для загрузки данных аэропортов-->
 <!--        async function fetchAirports(searchTerm) {-->
 <!--            try {-->
-<!--                const response = await fetch(`/icao/airport?name=${encodeURIComponent(searchTerm)}`);-->
+<!--                const response = await fetch(`/icao/airport?query=${encodeURIComponent(searchTerm)}`);-->
 <!--                if (!response.ok) throw new Error('Network response was not ok');-->
 <!--                return await response.json();-->
 <!--            } catch (error) {-->
@@ -100,8 +100,8 @@
 <!--            const airports = await fetchAirports(searchTerm);-->
 <!--            if (airports.length > 0) {-->
 <!--                airportDropdown.innerHTML = airports.map(airport =>-->
-<!--                    `<div data-icao="${airport.icao}" data-name="${airport.name}">-->
-<!--                        ${airport.name} (${airport.icao})-->
+<!--                    `<div data-icao="${airport.icao}" data-query="${airport.query}">-->
+<!--                        ${airport.query} (${airport.icao})-->
 <!--                    </div>`-->
 <!--                ).join('');-->
 <!--                airportDropdown.style.display = 'block';-->
@@ -121,8 +121,8 @@
 <!--            const airports = await fetchAirports(searchTerm);-->
 <!--            if (airports.length > 0) {-->
 <!--                icaoDropdown.innerHTML = airports.map(airport =>-->
-<!--                    `<div data-icao="${airport.icao}" data-name="${airport.name}">-->
-<!--                        ${airport.icao} - ${airport.name}-->
+<!--                    `<div data-icao="${airport.icao}" data-query="${airport.query}">-->
+<!--                        ${airport.icao} - ${airport.query}-->
 <!--                    </div>`-->
 <!--                ).join('');-->
 <!--                icaoDropdown.style.display = 'block';-->
@@ -136,13 +136,13 @@
 <!--            dropdown.addEventListener('click', function(e) {-->
 <!--                if (e.target && e.target.nodeName === 'DIV') {-->
 <!--                    const icao = e.target.getAttribute('data-icao');-->
-<!--                    const name = e.target.getAttribute('data-name');-->
+<!--                    const query = e.target.getAttribute('data-query');-->
 
 <!--                    if (isIcao) {-->
 <!--                        inputField.value = icao;-->
-<!--                        otherField.value = name;-->
+<!--                        otherField.value = query;-->
 <!--                    } else {-->
-<!--                        inputField.value = name;-->
+<!--                        inputField.value = query;-->
 <!--                        otherField.value = icao;-->
 <!--                    }-->
 

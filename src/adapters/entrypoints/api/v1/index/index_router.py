@@ -17,7 +17,7 @@ async def index(request: Request, user: User = Depends(user_is_auth)):
 
 # async def index(request: Request):
 #     return main.templates.TemplateResponse(
-#         request=request, name="base.html", context={"title": "Adventures"}
+#         request=request, query="base.html", context={"title": "Adventures"}
 #     )
 
 
