@@ -3,16 +3,6 @@
 {% block content %}
     <title>Login</title>
     <style>
-<!--        body {-->
-<!--            font-family: Arial, sans-serif;-->
-<!--            background-color: #f4f4f9;-->
-<!--            margin: 0;-->
-<!--            padding: 0;-->
-<!--            display: flex;-->
-<!--            justify-content: center;-->
-<!--            align-items: center;-->
-<!--            height: 100vh;-->
-<!--        }-->
         .login-container {
             background: white;
             padding: 2rem;
@@ -65,7 +55,7 @@
 
     <div class="login-container">
         <h2>Вход</h2>
-        <form id="loginForm" action="/auth/login/" method="POST">
+        <form id="loginForm" action="/api/v1/auth/login/" method="POST">
             <div class="form-group">
                 <label for="email">Почта</label>
                 <input type="email" id="email" name="email" required>
@@ -90,7 +80,7 @@
             const password = document.getElementById('password').value;
 
             try {
-                const response = await fetch('/auth/login/', {
+                const response = await fetch('/api/v1/auth/login/', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -102,7 +92,7 @@
                 });
 
                 if (response.ok) {
-                    window.location.href = '/users/profile/';
+                    window.location.href = '/api/v1/users/profile/';
                 } else {
                     const data = await response.json();
                     document.getElementById('errorMessage').textContent = data.detail || 'Login failed';

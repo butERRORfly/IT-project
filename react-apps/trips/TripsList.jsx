@@ -21,7 +21,7 @@ const TripsList = ({ routes, isAuthenticated }) => {
         {routes.map((routeId, index) => (
           <a
             key={routeId}
-            href={`/trips/${routeId}`}
+            href={`/api/v1/app/saved_trips/${routeId}`}
             className="route-card"
           >
             <span className="route-number">Маршрут #{index + 1}</span>

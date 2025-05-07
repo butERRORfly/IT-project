@@ -36,7 +36,7 @@
     <p>Вы вошли как: {{ admin.first_name }} {{ admin.last_name }} ({{ admin.email }})</p>
 
     <div class="filters">
-    <form method="get" action="/users/">
+    <form method="get" action="/api/v1/users/">
         <select name="role_id" onchange="this.form.submit()" id="roleSelect">
             <option value="">Все роли</option>
             <option value="1" {% if current_role_filter == 1 %}selected{% endif %}>User</option>
@@ -58,7 +58,7 @@
                 {% elif user.role.id == 1 %}User
                 {% endif %}
             </span>
-            <a href="/users/{{ user.id }}/">Подробнее</a>
+            <a href="/api/v1/users/{{ user.id }}/">Подробнее</a>
         </div>
         {% endfor %}
     </div>
@@ -69,7 +69,7 @@
         const roleValue = this.value;
 
         if (roleValue === "") {
-            window.location.href = "/users/";
+            window.location.href = "/api/v1/users/";
         } else {
             form.submit();
         }

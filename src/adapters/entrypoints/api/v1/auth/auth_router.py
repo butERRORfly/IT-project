@@ -47,7 +47,7 @@ async def login_page(request: Request):
 @router.post("/logout/", summary="Выход")
 async def logout_user(response: Response):
     redirect_response = RedirectResponse(
-        url="/auth/login/",
+        url="/api/v1/auth/login/",
         status_code=status.HTTP_303_SEE_OTHER
     )
     redirect_response.delete_cookie(key="users_access_token")

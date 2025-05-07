@@ -88,11 +88,6 @@ flag_change.addEventListener('change', function(e) {
    }
 });
 
-
-
-
-
-
 async function create(){
     const select = document.getElementById('currencies');
     for (let i = 0; i < currencies.length; i++) {

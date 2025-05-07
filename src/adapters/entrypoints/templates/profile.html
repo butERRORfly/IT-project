@@ -3,16 +3,6 @@
 {% block content %}
     <title>User Profile</title>
     <style>
-<!--        body {-->
-<!--            font-family: Arial, sans-serif;-->
-<!--            background-color: #f4f4f9;-->
-<!--            margin: 0;-->
-<!--            padding: 0;-->
-<!--            display: flex;-->
-<!--            justify-content: center;-->
-<!--            align-items: center;-->
-<!--            height: 100vh;-->
-<!--        }-->
         .profile-container {
             background: white;
             padding: 2rem;
@@ -109,12 +99,12 @@
         </div>
 
         {% if user.role_id == 2 %}
-        <form action="/users/" class="logout-form">
+        <form action="/api/v1/users/" class="logout-form">
             <button type="submit" class="role-btn">Админ панель</button>
         </form>
         {% endif %}
 
-        <form action="/auth/logout" method="post" class="logout-form">
+        <form action="/api/v1/auth/logout" method="post" class="logout-form">
             <button type="submit" class="logout-btn">Выйти</button>
         </form>
 

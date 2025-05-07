@@ -119,14 +119,14 @@ const handleSave = async () => {
         airto: pointsData.air[index] || '!',
         airout: pointsData.air2[index] || '!',
         icao: pointsData.icao[index] || '!',
-        icao1: pointsData.icao[index] || '!', // Дублируем, как в оригинале
+        icao1: pointsData.icao2[index] ||  null,
         hotel: pointsData.gost[index] || '!',
         price: pointsData.cost[index] || '0-USD',
         type: pointsData.typic[index] || 'poliline'
       }));
 
       // Отправка на сервер
-      const response = await fetch('http://127.0.0.1:8000/send', {
+      const response = await fetch('http://127.0.0.1:8000/api/v1/app/send/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -135,7 +135,7 @@ const handleSave = async () => {
       });
 
       if (response.ok) {
-        window.location.href = '/';
+        window.location.href = '/api/v1/';
       } else {
         console.error('Ошибка при сохранении');
       }

@@ -10,7 +10,7 @@ export const useTimezoneAPI = () => {
   const getDataByRegion = async (latitude, longitude) => {
     try {
       // Вместо прямого запроса к timezonedb, используем наш бэкенд
-      const response = await fetch('/location/', {
+      const response = await fetch('/api/v1/app/location/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

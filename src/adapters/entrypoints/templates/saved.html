@@ -65,7 +65,7 @@
 
     async function get_data_by_region(latitude, longitude) {
     try {
-      const response = await fetch('/location/', {
+      const response = await fetch('/api/v1/app/location/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

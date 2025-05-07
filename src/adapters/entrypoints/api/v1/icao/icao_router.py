@@ -23,7 +23,7 @@ rout = APIRouter()
 templates = Jinja2Templates(directory="src/adapters/entrypoints/templates")
 
 
-@rout.get("/icao/", response_class=HTMLResponse, summary="Страница создания путешествия")
+@rout.get("/new_trip/", response_class=HTMLResponse, summary="Страница создания нового путешествия")
 async def return_page(
     request: Request,
     user: User = Depends(get_current_user),
@@ -37,7 +37,7 @@ async def return_page(
         }
     )
 
-@rout.get("/icao/airport", response_model=List[dict], summary="Поиск аэропорта/ICAO кода")
+@rout.get("/new_trip/airport", response_model=List[dict], summary="Поиск аэропорта/ICAO кода")
 async def search_airports(
         name: Optional[str] = Query(None, min_length=2, description="Search term for airport name or ICAO code"),
         limit: int = Query(5, ge=1, le=20, description="Maximum number of results to return"),
@@ -50,19 +50,19 @@ async def search_airports(
     return [{"icao": airport.icao, "name": airport.name} for airport in airports]
 
 
-@rout.get('/map/', response_class=HTMLResponse)
+@rout.get('/map/', response_class=HTMLResponse, summary="Отображение Yandex Map")
 async def f(request: Request, user: User = Depends(get_current_user)) -> HTMLResponse:
     return templates.TemplateResponse("map.html", {"request": request, "user": user})
 
 
-@rout.get('/trips', response_class=HTMLResponse, name="trips")
+@rout.get('/saved_trips/', response_class=HTMLResponse, name="trips", summary="Сохраненные путешествия пользователя")
 async def show_trips_page(request: Request, user: User = Depends(get_current_user)) -> HTMLResponse:
     current = await TripDao.find_all_way_id(user_id=user.id)
     return templates.TemplateResponse("my_trips.html", {"request": request, "user": user, "current": current})
 
 
-@rout.get('/trips/{number:int}', response_class=HTMLResponse)
-async def show_way(request: Request, number: int, possible: list = Depends(legal_way_for_user),
+@rout.get('/saved_trips/{id_trip:int}', response_class=HTMLResponse, summary="Получить сохраненное путешествие по id")
+async def show_way(request: Request, id_trip: int, possible: list = Depends(legal_way_for_user),
                    user: User = Depends(get_current_user)):
     parametrs = {
         'loc': [],
@@ -77,8 +77,8 @@ async def show_way(request: Request, number: int, possible: list = Depends(legal
         'icao': [],
         'icao2': []
     }
-    if number in possible:
-        data = await TripDao.find_parameters_by_way_id(way_id=number)
+    if id_trip in possible:
+        data = await TripDao.find_parameters_by_way_id(way_id=id_trip)
         if data:
 
             for i in data:
@@ -146,7 +146,7 @@ def calculate_date_difference(date1_str, date2_str) -> str:
         return 'Uncorected data'
 
 
-@rout.post("/submit/")
+@rout.post("/submit/", summary="Подтверждение к отправке созданного путешествия на сервер")
 async def submit_data(request: Request, forms: List[FormData], user: User = Depends(get_current_user)) -> HTMLResponse:
     req = [i.point for i in forms]
     req = {
@@ -166,7 +166,7 @@ async def submit_data(request: Request, forms: List[FormData], user: User = Depe
     return templates.TemplateResponse("map.html", {"request": request, "data": req, "user": user})
 
 
-@rout.post("/send/")
+@rout.post("/send/", summary="Отправка созданного путешествия в Базу Данных")
 async def save_users_route(request: Request, forms: List[RouteData], user: User = Depends(get_current_user)) -> dict:
     personal_way = await TripDao.add_way(user_id=user.id)
     if personal_way is not None:
@@ -176,7 +176,7 @@ async def save_users_route(request: Request, forms: List[RouteData], user: User 
             return {'message': 'Was was sucesseful saved!'}
 
 
-@rout.post("/location/")
+@rout.post("/location/", summary="Получение местоположения для определения часового пояса")
 async def receive_coordinates(payload: CoordinatesPayload) -> dict:
     latitude = payload.latitude
     longitude = payload.longitude

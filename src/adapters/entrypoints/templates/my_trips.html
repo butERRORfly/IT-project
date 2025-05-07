@@ -34,17 +34,6 @@
                  data-routes="{{ current | tojson | safe }}"
                  data-is-authenticated="{{ 'true' if user else 'false' }}"></div>
             <script src="/static/bundle-trips.js" type="module"></script>
-<!--            {% if (current | length) > 0 %}-->
-<!--                {% for i in range(current | length) %}-->
-<!--                <div class = 'parent'>-->
-<!--                <div class = 'link'>-->
-<!--                    <a href="{{ url_for('show_way', number=current[i]) }}">Ваше путешествие номер {{ i+1 }}</a>-->
-<!--                </div>-->
-<!--                {% endfor %}-->
-<!--                </div>-->
-<!--            {% else %}-->
-<!--            <p> У вас нет сохраненных маршрутов</p>-->
-<!--            {% endif %}-->
         </main>
     </div>
 </body>

@@ -73,7 +73,7 @@
 
 async function get_data_by_region(latitude, longitude) {
     try {
-      const response = await fetch('/location/', {
+      const response = await fetch('/api/v1/app/location/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -371,7 +371,7 @@ document.getElementById('send_to_database').addEventListener('click', async func
     server.push({place,to,out,airto,airout,icao,icao1,hotel,price,type});
     }
 
-    const response = await fetch('http://127.0.0.1:8000/send', {
+    const response = await fetch('http://127.0.0.1:8000/api/v1/app/send/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

@@ -7,7 +7,7 @@ async function fetchAirports(searchTerm) {
     }
 
     try {
-        const response = await fetch(`/icao/airport?name=${encodeURIComponent(searchTerm)}`);
+        const response = await fetch(`/api/v1/app/new_trip/airport?name=${encodeURIComponent(searchTerm)}`);
         if (!response.ok) throw new Error('Network response was not ok');
         const data = await response.json();
         airportCache[searchTerm] = data;
