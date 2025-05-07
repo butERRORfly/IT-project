@@ -219,6 +219,10 @@ function addForm() {
 
     document.getElementById('form-wrapper').insertBefore(newFormContainer, document.querySelector('.add-button'));
     add_cur();
+
+    setTimeout(() => {
+        initAllAutocompletes();
+    }, 0);
 }
 
 async function submitData() {

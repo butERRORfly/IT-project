@@ -58,120 +58,121 @@
 </div>
 
 <script src="/src/adapters/entrypoints/static/icao/test.js"></script>
+<script src="/src/adapters/entrypoints/static/icao/autocomplete.js"></script>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Обработчики для первого контейнера
-        setupAutocomplete(0);
-    });
+<!--<script>-->
+<!--    document.addEventListener('DOMContentLoaded', function() {-->
+<!--        // Обработчики для первого контейнера-->
+<!--        setupAutocomplete(0);-->
+<!--    });-->
 
-    document.addEventListener('DOMContentLoaded', function() {
-        // Обработчики для первого контейнера
-        setupAutocomplete(1);
-    });
+<!--    document.addEventListener('DOMContentLoaded', function() {-->
+<!--        // Обработчики для первого контейнера-->
+<!--        setupAutocomplete(1);-->
+<!--    });-->
 
-    function setupAutocomplete(index) {
-        const airportInput = document.getElementById(`air2-${index}`);
-        const icaoInput = document.getElementById(`icao2-${index}`);
-        const airportDropdown = document.getElementById(`airport-dropdown-${index}`);
-        const icaoDropdown = document.getElementById(`icao-dropdown-${index}`);
+<!--    function setupAutocomplete(index) {-->
+<!--        const airportInput = document.getElementById(`air2-${index}`);-->
+<!--        const icaoInput = document.getElementById(`icao2-${index}`);-->
+<!--        const airportDropdown = document.getElementById(`airport-dropdown-${index}`);-->
+<!--        const icaoDropdown = document.getElementById(`icao-dropdown-${index}`);-->
 
-        // Функция для загрузки данных аэропортов
-        async function fetchAirports(searchTerm) {
-            try {
-                const response = await fetch(`/icao/airport?name=${encodeURIComponent(searchTerm)}`);
-                if (!response.ok) throw new Error('Network response was not ok');
-                return await response.json();
-            } catch (error) {
-                console.error('Error fetching airports:', error);
-                return [];
-            }
-        }
+<!--        // Функция для загрузки данных аэропортов-->
+<!--        async function fetchAirports(searchTerm) {-->
+<!--            try {-->
+<!--                const response = await fetch(`/icao/airport?name=${encodeURIComponent(searchTerm)}`);-->
+<!--                if (!response.ok) throw new Error('Network response was not ok');-->
+<!--                return await response.json();-->
+<!--            } catch (error) {-->
+<!--                console.error('Error fetching airports:', error);-->
+<!--                return [];-->
+<!--            }-->
+<!--        }-->
 
-        // Обработчик для поля аэропорта
-        airportInput.addEventListener('input', async function() {
-            const searchTerm = this.value;
-            if (searchTerm.length < 2) {
-                airportDropdown.style.display = 'none';
-                return;
-            }
+<!--        // Обработчик для поля аэропорта-->
+<!--        airportInput.addEventListener('input', async function() {-->
+<!--            const searchTerm = this.value;-->
+<!--            if (searchTerm.length < 2) {-->
+<!--                airportDropdown.style.display = 'none';-->
+<!--                return;-->
+<!--            }-->
 
-            const airports = await fetchAirports(searchTerm);
-            if (airports.length > 0) {
-                airportDropdown.innerHTML = airports.map(airport =>
-                    `<div data-icao="${airport.icao}" data-name="${airport.name}">
-                        ${airport.name} (${airport.icao})
-                    </div>`
-                ).join('');
-                airportDropdown.style.display = 'block';
-            } else {
-                airportDropdown.style.display = 'none';
-            }
-        });
+<!--            const airports = await fetchAirports(searchTerm);-->
+<!--            if (airports.length > 0) {-->
+<!--                airportDropdown.innerHTML = airports.map(airport =>-->
+<!--                    `<div data-icao="${airport.icao}" data-name="${airport.name}">-->
+<!--                        ${airport.name} (${airport.icao})-->
+<!--                    </div>`-->
+<!--                ).join('');-->
+<!--                airportDropdown.style.display = 'block';-->
+<!--            } else {-->
+<!--                airportDropdown.style.display = 'none';-->
+<!--            }-->
+<!--        });-->
 
-        // Обработчик для поля ICAO
-        icaoInput.addEventListener('input', async function() {
-            const searchTerm = this.value;
-            if (searchTerm.length < 2) {
-                icaoDropdown.style.display = 'none';
-                return;
-            }
+<!--        // Обработчик для поля ICAO-->
+<!--        icaoInput.addEventListener('input', async function() {-->
+<!--            const searchTerm = this.value;-->
+<!--            if (searchTerm.length < 2) {-->
+<!--                icaoDropdown.style.display = 'none';-->
+<!--                return;-->
+<!--            }-->
 
-            const airports = await fetchAirports(searchTerm);
-            if (airports.length > 0) {
-                icaoDropdown.innerHTML = airports.map(airport =>
-                    `<div data-icao="${airport.icao}" data-name="${airport.name}">
-                        ${airport.icao} - ${airport.name}
-                    </div>`
-                ).join('');
-                icaoDropdown.style.display = 'block';
-            } else {
-                icaoDropdown.style.display = 'none';
-            }
-        });
+<!--            const airports = await fetchAirports(searchTerm);-->
+<!--            if (airports.length > 0) {-->
+<!--                icaoDropdown.innerHTML = airports.map(airport =>-->
+<!--                    `<div data-icao="${airport.icao}" data-name="${airport.name}">-->
+<!--                        ${airport.icao} - ${airport.name}-->
+<!--                    </div>`-->
+<!--                ).join('');-->
+<!--                icaoDropdown.style.display = 'block';-->
+<!--            } else {-->
+<!--                icaoDropdown.style.display = 'none';-->
+<!--            }-->
+<!--        });-->
 
-        // Обработчик выбора из dropdown
-        function handleDropdownSelection(dropdown, inputField, otherField, isIcao) {
-            dropdown.addEventListener('click', function(e) {
-                if (e.target && e.target.nodeName === 'DIV') {
-                    const icao = e.target.getAttribute('data-icao');
-                    const name = e.target.getAttribute('data-name');
+<!--        // Обработчик выбора из dropdown-->
+<!--        function handleDropdownSelection(dropdown, inputField, otherField, isIcao) {-->
+<!--            dropdown.addEventListener('click', function(e) {-->
+<!--                if (e.target && e.target.nodeName === 'DIV') {-->
+<!--                    const icao = e.target.getAttribute('data-icao');-->
+<!--                    const name = e.target.getAttribute('data-name');-->
 
-                    if (isIcao) {
-                        inputField.value = icao;
-                        otherField.value = name;
-                    } else {
-                        inputField.value = name;
-                        otherField.value = icao;
-                    }
+<!--                    if (isIcao) {-->
+<!--                        inputField.value = icao;-->
+<!--                        otherField.value = name;-->
+<!--                    } else {-->
+<!--                        inputField.value = name;-->
+<!--                        otherField.value = icao;-->
+<!--                    }-->
 
-                    dropdown.style.display = 'none';
-                }
-            });
-        }
+<!--                    dropdown.style.display = 'none';-->
+<!--                }-->
+<!--            });-->
+<!--        }-->
 
-        handleDropdownSelection(airportDropdown, airportInput, icaoInput, false);
-        handleDropdownSelection(icaoDropdown, icaoInput, airportInput, true);
+<!--        handleDropdownSelection(airportDropdown, airportInput, icaoInput, false);-->
+<!--        handleDropdownSelection(icaoDropdown, icaoInput, airportInput, true);-->
 
-        // Скрыть dropdown при клике вне его
-        document.addEventListener('click', function(e) {
-            if (!airportInput.contains(e.target) && !airportDropdown.contains(e.target)) {
-                airportDropdown.style.display = 'none';
-            }
-            if (!icaoInput.contains(e.target) && !icaoDropdown.contains(e.target)) {
-                icaoDropdown.style.display = 'none';
-            }
-        });
-    }
-
-<!--    // Модифицируем функцию addForm() для поддержки автодополнения в новых формах-->
-<!--    function addForm() {-->
-<!--        // ... существующий код addForm() ...-->
-<!--        -->
-<!--        // После создания новой формы вызываем setupAutocomplete для нового индекса-->
-<!--        const newIndex = /* определить новый индекс */;-->
-<!--        setupAutocomplete(newIndex);-->
+<!--        // Скрыть dropdown при клике вне его-->
+<!--        document.addEventListener('click', function(e) {-->
+<!--            if (!airportInput.contains(e.target) && !airportDropdown.contains(e.target)) {-->
+<!--                airportDropdown.style.display = 'none';-->
+<!--            }-->
+<!--            if (!icaoInput.contains(e.target) && !icaoDropdown.contains(e.target)) {-->
+<!--                icaoDropdown.style.display = 'none';-->
+<!--            }-->
+<!--        });-->
 <!--    }-->
-</script>
+
+<!--&lt;!&ndash;    // Модифицируем функцию addForm() для поддержки автодополнения в новых формах&ndash;&gt;-->
+<!--&lt;!&ndash;    function addForm() {&ndash;&gt;-->
+<!--&lt;!&ndash;        // ... существующий код addForm() ...&ndash;&gt;-->
+<!--&lt;!&ndash;        &ndash;&gt;-->
+<!--&lt;!&ndash;        // После создания новой формы вызываем setupAutocomplete для нового индекса&ndash;&gt;-->
+<!--&lt;!&ndash;        const newIndex = /* определить новый индекс */;&ndash;&gt;-->
+<!--&lt;!&ndash;        setupAutocomplete(newIndex);&ndash;&gt;-->
+<!--&lt;!&ndash;    }&ndash;&gt;-->
+<!--</script>-->
 
 {% endblock %}
