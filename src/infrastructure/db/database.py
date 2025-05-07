@@ -1,6 +1,6 @@
 from datetime import datetime
 from typing import List
-
+from typing import Dict, Any
 from sqlalchemy import create_engine, func, ForeignKey, Integer, String, DateTime
 from sqlalchemy.orm import DeclarativeBase, declared_attr, Mapped, mapped_column, relationship, Session
 from sqlalchemy import text, select
@@ -18,6 +18,9 @@ from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, Asyn
 from sqlalchemy.orm import DeclarativeBase, declared_attr, Mapped, mapped_column, relationship
 from sqlalchemy import text, Integer
 from src.configurator.config import get_db_url
+import csv
+from sqlalchemy import insert
+import os
 
 DATABASE_URL = get_db_url()
 
@@ -25,6 +28,7 @@ engine = create_async_engine(DATABASE_URL)
 async_session_maker = async_sessionmaker(engine, expire_on_commit=False)
 
 int_pk = Annotated[int, mapped_column(primary_key=True)]
+str_pk = Annotated[str, mapped_column(primary_key=True)]
 created_at = Annotated[datetime, mapped_column(DateTime(timezone=True), server_default=func.now())]
 updated_at = Annotated[datetime, mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())]
 str_uniq = Annotated[str, mapped_column(String, unique=True, nullable=False)]
@@ -77,17 +81,18 @@ class WayParameter(Base):
     to: Mapped[str_null_true]
     out: Mapped[str_null_true]
     airto: Mapped[str_null_true]
-    airout:Mapped[str_null_true]
-    icao:Mapped[str_null_true]
-    icao1:Mapped[str_null_true]
-    hotel:Mapped[str_null_true]
-    price:Mapped[str_null_true]
+    airout: Mapped[str_null_true]
+    icao: Mapped[str_null_true]
+    icao1: Mapped[str_null_true]
+    hotel: Mapped[str_null_true]
+    price: Mapped[str_null_true]
     type: Mapped[str_null_true]
 
     way: Mapped["Way"] = relationship(back_populates="parameters")
 
     def __repr__(self):
         return f"{self.__class__.__name__}(id={self.id})"
+
 
 class Way(Base):
     id: Mapped[int_pk]
@@ -98,3 +103,10 @@ class Way(Base):
 
     def __repr__(self):
         return f"{self.__class__.__name__}(id={self.id}, user_id={self.user_id})"
+
+
+class Airport(Base):
+    __tablename__ = 'icao'
+
+    icao: Mapped[str_pk]
+    name: Mapped[str_not_null]

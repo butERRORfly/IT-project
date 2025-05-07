@@ -14,18 +14,40 @@ from pydantic import BaseModel
 import requests
 from datetime import datetime
 from src.infrastructure.db.dao.users import UsersDAO, TripDao
+from src.infrastructure.db.dao.airport import AirportDAO
 from src.infrastructure.db.database import User
 import requests
-import os
-
+from fastapi import Query
 
 rout = APIRouter()
 templates = Jinja2Templates(directory="src/adapters/entrypoints/templates")
 
 
-@rout.get("/icao/", response_class=HTMLResponse)
-async def return_page(request: Request, user: User = Depends(get_current_user)) -> HTMLResponse:
-    return templates.TemplateResponse("form.html", {"request": request, "user": user})
+@rout.get("/icao/", response_class=HTMLResponse, summary="Страница создания путешествия")
+async def return_page(
+    request: Request,
+    user: User = Depends(get_current_user),
+) -> HTMLResponse:
+
+    return templates.TemplateResponse(
+        "form.html",
+        {
+            "request": request,
+            "user": user,
+        }
+    )
+
+@rout.get("/icao/airport", response_model=List[dict], summary="Поиск аэропорта/ICAO кода")
+async def search_airports(
+        name: Optional[str] = Query(None, min_length=2, description="Search term for airport name or ICAO code"),
+        limit: int = Query(5, ge=1, le=20, description="Maximum number of results to return"),
+        user: User = Depends(get_current_user)
+):
+    if len(name) < 2:
+        return []
+
+    airports = await AirportDAO.search_airports(search_term=name, limit=limit)
+    return [{"icao": airport.icao, "name": airport.name} for airport in airports]
 
 
 @rout.get('/map/', response_class=HTMLResponse)
@@ -35,11 +57,13 @@ async def f(request: Request, user: User = Depends(get_current_user)) -> HTMLRes
 
 @rout.get('/trips', response_class=HTMLResponse, name="trips")
 async def show_trips_page(request: Request, user: User = Depends(get_current_user)) -> HTMLResponse:
-    current = await TripDao.find_all_way_id(user_id = user.id)
+    current = await TripDao.find_all_way_id(user_id=user.id)
     return templates.TemplateResponse("my_trips.html", {"request": request, "user": user, "current": current})
 
+
 @rout.get('/trips/{number:int}', response_class=HTMLResponse)
-async def show_way(request: Request, number:int,  possible: list = Depends(legal_way_for_user), user: User = Depends(get_current_user)):
+async def show_way(request: Request, number: int, possible: list = Depends(legal_way_for_user),
+                   user: User = Depends(get_current_user)):
     parametrs = {
         'loc': [],
         'date_to': [],
@@ -54,7 +78,7 @@ async def show_way(request: Request, number:int,  possible: list = Depends(legal
         'icao2': []
     }
     if number in possible:
-        data = await TripDao.find_parameters_by_way_id(way_id = number)
+        data = await TripDao.find_parameters_by_way_id(way_id=number)
         if data:
 
             for i in data:
@@ -69,14 +93,12 @@ async def show_way(request: Request, number:int,  possible: list = Depends(legal
                 parametrs['icao'].append(i.icao)
                 parametrs['icao2'].append(i.icao1)
         print(parametrs)
-        return templates.TemplateResponse("saved.html", {"request": request,"data": parametrs, "user": user})
+        return templates.TemplateResponse("saved.html", {"request": request, "data": parametrs, "user": user})
     else:
-       raise HTTPException(
-           status_code=status.HTTP_403_FORBIDDEN,
-           detail="Your request has been blocked"
-       )
-
-
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Your request has been blocked"
+        )
 
 
 class FormData(BaseModel):
@@ -105,9 +127,11 @@ class RouteData(BaseModel):
     price: Optional[str] = None
     type: Optional[str] = None
 
+
 class CoordinatesPayload(BaseModel):
     latitude: float
     longitude: float
+
 
 def calculate_date_difference(date1_str, date2_str) -> str:
     try:
@@ -134,21 +158,22 @@ async def submit_data(request: Request, forms: List[FormData], user: User = Depe
         'cost': [i.cost for i in forms],
         'wait': [calculate_date_difference(i.date_to, i.date_out) for i in forms],
         'typic': [i.typic for i in forms],
-        'air':[i.air for i in forms],
-        'air2':[i.air2 for i in forms],
-        'icao':[i.icao for i in forms],
-        'icao2':[i.icao2 for i in forms]
+        'air': [i.air for i in forms],
+        'air2': [i.air2 for i in forms],
+        'icao': [i.icao for i in forms],
+        'icao2': [i.icao2 for i in forms]
     }
     return templates.TemplateResponse("map.html", {"request": request, "data": req, "user": user})
 
+
 @rout.post("/send/")
-async def save_users_route(request: Request, forms: List[RouteData], user: User = Depends(get_current_user))->dict:
-    personal_way = await TripDao.add_way(user_id = user.id)
+async def save_users_route(request: Request, forms: List[RouteData], user: User = Depends(get_current_user)) -> dict:
+    personal_way = await TripDao.add_way(user_id=user.id)
     if personal_way is not None:
-       trip = await TripDao.add_point_way(way_id = personal_way.id, data = [route.dict() for route in forms])
-       if trip is not None:
-           print('way was saved')
-           return {'message': 'Was was sucesseful saved!'}
+        trip = await TripDao.add_point_way(way_id=personal_way.id, data=[route.dict() for route in forms])
+        if trip is not None:
+            print('way was saved')
+            return {'message': 'Was was sucesseful saved!'}
 
 
 @rout.post("/location/")
@@ -166,6 +191,3 @@ async def receive_coordinates(payload: CoordinatesPayload) -> dict:
     except requests.exceptions.RequestException as e:
         print(f"Ошибка при запросе к TimezoneDB API: {e}")
         return {'status': "ERROR"}
-
-
-

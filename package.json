@@ -21,6 +21,6 @@
   "dependencies": {
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
-    "vite": "^6.3.4"
+    "vite": "^6.3.5"
   }
 }
