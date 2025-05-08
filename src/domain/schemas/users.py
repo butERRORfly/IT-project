@@ -17,6 +17,15 @@ class UserRegister(BaseModel):
             raise ValueError('Номер телефона должен начинаться с "+" и содержать от 5 до 15 цифр')
         return value
 
+class User(BaseModel):
+    id: int = Field(..., description="ID пользователя")
+    email: EmailStr = Field(..., description="Электронная почта")
+    phone_number: str = Field(..., description="Номер телефона")
+    first_name: str = Field(..., description="Имя")
+    last_name: str = Field(..., description="Фамилия")
+    role_id: int = Field(..., description="Роль пользователя")
+    is_active: bool = Field(default=True, description="Активен ли пользователь")
+
 
 class UserAuth(BaseModel):
     email: EmailStr = Field(..., description="Электронная почта")

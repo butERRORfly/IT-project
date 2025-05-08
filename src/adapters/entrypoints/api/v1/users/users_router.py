@@ -1,12 +1,15 @@
 from fastapi import APIRouter, HTTPException, status, Depends, Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
+
+from src.domain.schemas import users
 from src.infrastructure.db.dao.users import UsersDAO, TripDao
 from src.infrastructure.db.database import User
 from src.adapters.entrypoints.utilities.dependencies import get_current_user, get_current_admin_user, user_is_auth
 from fastapi import Query
 from typing import Optional
 from math import ceil
+from typing import List
 
 router = APIRouter()
 templates = Jinja2Templates(directory="src/adapters/entrypoints/templates")
@@ -53,6 +56,53 @@ async def get_all_users_html(
             "total_users": total_users,
             "total_trips": len(total_trips),
             "total_roles": len(total_roles),
+        }
+    )
+
+
+@router.get("/filter", response_model=List[users.User], summary="Поиск пользователя по Имени/Фамилии")
+async def search_user(
+        name: Optional[str] = Query(None, min_length=2, description="Search term user"),
+        limit: int = Query(5, ge=1, le=20, description="Maximum number of results to return"),
+):
+    if len(name) < 2:
+        return []
+
+    users = await UsersDAO.search_users(search_term=name, limit=limit)
+    return users
+
+
+@router.get("/statistics/", response_class=HTMLResponse, summary="Получить статистику")
+async def get_statistics(
+        request: Request,
+        user: User = Depends(user_is_auth)
+):
+    max_count_of_trips = await TripDao.find_max_count('place')
+    max_count_of_hotels = await TripDao.find_max_count('hotel')
+    max_count_of_transport_type = await TripDao.find_max_count('type')
+    max_count_of_date = await TripDao.find_max_count('out')
+
+    seasons = {
+        'Зима': ['01', '02', '03'],
+        'Весна': ['04', '05', '06'],
+        'Лето': ['07', '08', '09'],
+        'Осень': ['10', '11', '12'],
+    }
+
+    season = ''
+    for i in seasons.keys():
+        if max_count_of_date[5:7] in seasons[i]:
+            season = i
+
+    return templates.TemplateResponse(
+        "users/statistics.html",
+        {
+            "request": request,
+            "user": user,
+            "total_trips": max_count_of_trips,
+            "max_count_of_hotels": max_count_of_hotels,
+            "max_count_of_transport_type": max_count_of_transport_type,
+            "max_count_of_date": season,
         }
     )
 
@@ -115,7 +165,6 @@ async def change_user_role(
         )
 
     valid_roles = await UsersDAO.get_all_roles()
-    print(valid_roles)
     if id_role not in valid_roles:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,

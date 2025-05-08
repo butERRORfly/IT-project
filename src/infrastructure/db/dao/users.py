@@ -8,7 +8,7 @@ from src.domain.ports.user_repository import UserRepository
 from src.infrastructure.db.database import async_session_maker
 from typing import Optional, List
 from sqlalchemy.orm import joinedload
-
+from sqlalchemy import or_, func
 
 class UsersDAO(UserRepository):
     model = User
@@ -128,6 +128,20 @@ class UsersDAO(UserRepository):
             description=role.description,
         )
 
+    @classmethod
+    async def search_users(cls, search_term: str, limit: int = 5):
+        async with async_session_maker() as session:
+            query = select(cls.model).where(
+                or_(
+                    cls.model.first_name.ilike(f"%{search_term}%"),
+                    cls.model.last_name.ilike(f"%{search_term}%")
+                )
+            ).order_by(cls.model.first_name).limit(limit)
+
+            result = await session.execute(query)
+            return result.scalars().all()
+
+
 class TripDao():   # Абстрактный класс - написать
     model = Way
     model_2 = WayParameter
@@ -192,3 +206,15 @@ class TripDao():   # Абстрактный класс - написать
             query = select(cls.model).filter_by(**filter_by)
             result = await session.execute(query)
             return result.scalars().all()
+
+    @classmethod
+    async def find_max_count(cls, column_name):
+        async with async_session_maker() as session:
+            column = getattr(WayParameter, column_name)
+
+            query = select(
+                func.mode().within_group(column.asc())
+            )
+
+            result = await session.execute(query)
+            return result.scalar()
