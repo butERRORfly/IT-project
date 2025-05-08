@@ -2,24 +2,24 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useTimer } from './useTimer';
 import { currencies } from './TotalPrice';
 
-export default function RoutePoint({ location, i, timeData, data, onPointUpdate }) {
+export default function RoutePoint({ location, i, timeData, data, onPointUpdate, prevTypic }) {
   const timeInfo = timeData.find(item => item.id === i) || {};
   const displayTime = useTimer(timeInfo.time);
 
   const [editMode, setEditMode] = useState(!data.date_out?.[i]);
   const [formData, setFormData] = useState({
-    loc: location,
-    typic: data.typic?.[i] || 'poliline',
-    date_to: data.date_to?.[i] || '',
-    date_out: data.date_out?.[i] || '',
-    air: data.air?.[i] || '',
-    air2: data.air2?.[i] || '',
-    icao: data.icao?.[i] || '',
-    icao2: data.icao2?.[i] || '',
-    gost: data.gost?.[i] || '',
-    cost: data.cost?.[i] ? data.cost[i].split('-')[0] : '',
-    rec: data.rec?.[i] || '',
-    currency: data.cost?.[i] ? data.cost[i].split('-')[1] || 'USD' : 'USD',
+    loc: location === '!' ? null : location,
+    typic: data.typic?.[i] === '!' ? null : (data.typic?.[i] || 'poliline'),
+    date_to: data.date_to?.[i] === '!' ? null : (data.date_to?.[i] || ''),
+    date_out: data.date_out?.[i] === '!' ? null : (data.date_out?.[i] || ''),
+    air: data.air?.[i] === '!' ? null : (data.air?.[i] || ''),
+    air2: data.air2?.[i] === '!' ? null : (data.air2?.[i] || ''),
+    icao: data.icao?.[i] === '!' ? null : (data.icao?.[i] || ''),
+    icao2: data.icao2?.[i] === '!' ? null : (data.icao2?.[i] || ''),
+    gost: data.gost?.[i] === '!' ? null : (data.gost?.[i] || ''),
+    cost: data.cost?.[i] === '!' ? null : (data.cost?.[i] ? data.cost[i].split('-')[0] : ''),
+    rec: data.rec?.[i] === '!' ? null : (data.rec?.[i] || ''),
+    currency: data.cost?.[i] === '!' ? null : (data.cost?.[i] ? data.cost[i].split('-')[1] || 'USD' : 'USD'),
   });
 
   // Проверка на заглушки и undefined
@@ -41,10 +41,10 @@ export default function RoutePoint({ location, i, timeData, data, onPointUpdate 
       typic: formData.typic,
       date_to: formData.date_to,
       date_out: formData.date_out,
-      air: formData.air,
-      air2: formData.air2,
-      icao: formData.icao,
-      icao2: formData.icao2,
+      air: (prevTypic === 'poliline') ? formData.air : null,
+      air2: formData.typic === 'poliline' ? formData.air2 : null,
+      icao: (prevTypic === 'poliline') ? formData.icao : null,
+      icao2: formData.typic === 'poliline' ? formData.icao2 : null,
       gost: formData.gost,
       cost: `${formData.cost}-${formData.currency}`,
       rec: formData.rec,
@@ -106,45 +106,52 @@ export default function RoutePoint({ location, i, timeData, data, onPointUpdate 
           </div>
         </div>
 
-        <div>
-          <span className="label">Аэропорт прилета:</span>
-          <input
-            type="text"
-            name="air"
-            value={formData.air}
-            onChange={handleChange}
-          />
-        </div>
+        {(prevTypic === 'poliline') && (
+          <>
+            <div>
+              <span className="label">Аэропорт прилета:</span>
+              <input
+                type="text"
+                name="air"
+                value={formData.air}
+                onChange={handleChange}
+              />
+            </div>
 
-        <div>
-          <span className="label">Аэропорт вылета:</span>
-          <input
-            type="text"
-            name="air2"
-            value={formData.air2}
-            onChange={handleChange}
-          />
-        </div>
+            <div>
+              <span className="label">ICAO код прилета:</span>
+              <input
+                type="text"
+                name="icao"
+                value={formData.icao}
+                onChange={handleChange}
+              />
+            </div>
+          </>
+        )}
 
-        <div>
-          <span className="label">ICAO код прилета:</span>
-          <input
-            type="text"
-            name="icao"
-            value={formData.icao}
-            onChange={handleChange}
-          />
-        </div>
-
-        <div>
-          <span className="label">ICAO код вылета:</span>
-          <input
-            type="text"
-            name="icao2"
-            value={formData.icao2}
-            onChange={handleChange}
-          />
-        </div>
+        {formData.typic === 'poliline' &&
+          (<>
+            <div>
+              <span className="label">Аэропорт вылета:</span>
+              <input
+                type="text"
+                name="air2"
+                value={formData.air2}
+                onChange={handleChange}
+              />
+            </div>
+            <div>
+              <span className="label">ICAO код вылета:</span>
+              <input
+                type="text"
+                name="icao2"
+                value={formData.icao2}
+                onChange={handleChange}
+              />
+            </div>
+          </>)
+        }
 
         <div className="hotel-label">
           <span className="label">Гостиница:</span>
@@ -218,33 +225,33 @@ export default function RoutePoint({ location, i, timeData, data, onPointUpdate 
         </div>
       </div>
 
-      {hasAirport && (
+      {(prevTypic === 'poliline') && hasAirport && (
         <div>
           <span className="label">Аэропорт прилета:</span>
           <span className="value">{formData.air}</span>
         </div>
       )}
 
-      {hasAirportOut && (
-        <div>
-          <span className="label">Аэропорт вылета:</span>
-          <span className="value">{formData.air2}</span>
-        </div>
-      )}
-
-      {hasIcao && (
+      {(prevTypic === 'poliline') && hasIcao && (
         <div>
           <span className="label">ICAO код прилета:</span>
           <span className="value">{formData.icao}</span>
         </div>
       )}
 
-      {hasIcao2 && (
-        <div>
-          <span className="label">ICAO код вылета:</span>
-          <span className="value">{formData.icao2}</span>
-        </div>
-      )}
+      {hasAirportOut && formData.typic === 'poliline' && (
+  <div>
+    <span className="label">Аэропорт вылета:</span>
+    <span className="value">{formData.air2}</span>
+  </div>
+)}
+
+{hasIcao2 && formData.typic === 'poliline' && (
+  <div>
+    <span className="label">ICAO код вылета:</span>
+    <span className="value">{formData.icao2}</span>
+  </div>
+)}
 
       <div className="hotel-label">
         <span className="label">Гостиница:</span>

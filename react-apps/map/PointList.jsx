@@ -12,6 +12,7 @@ export default function PointList({ data, timeData = [], onPointUpdate }) {
           timeData={timeData}
           data={data}
           onPointUpdate={onPointUpdate}
+          prevTypic={i > 0 ? data.typic?.[i-1] : null}
         />
       ))}
     </div>
