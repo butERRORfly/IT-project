@@ -75,7 +75,8 @@ async def search_user(
 @router.get("/statistics/", response_class=HTMLResponse, summary="Получить статистику")
 async def get_statistics(
         request: Request,
-        user: User = Depends(user_is_auth)
+        user: User = Depends(user_is_auth),
+        admin_user: User = Depends(get_current_admin_user),
 ):
     max_count_of_trips = await TripDao.find_max_count('place')
     max_count_of_hotels = await TripDao.find_max_count('hotel')
@@ -99,6 +100,7 @@ async def get_statistics(
         {
             "request": request,
             "user": user,
+            "admin": admin_user,
             "total_trips": max_count_of_trips,
             "max_count_of_hotels": max_count_of_hotels,
             "max_count_of_transport_type": max_count_of_transport_type,

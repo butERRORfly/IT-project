@@ -311,6 +311,7 @@ main {
 .parent-container {
     height: 80vh;
     display: grid;
+    margin-bottom: 30px;
     grid-template-columns: 1fr 1fr; /* 2 колонки */
     grid-template-rows: 1fr 1fr;    /* 2 строки */
     gap: 10px;                      /* промежуток между блоками */
