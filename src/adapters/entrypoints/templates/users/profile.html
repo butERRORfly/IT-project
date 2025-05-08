@@ -67,47 +67,48 @@
             background-color: #0069d9;
         }
     </style>
+    <div class="container_block_inner">
+        <div class="profile-container">
+            <h2>Профиль пользователя</h2>
 
-    <div class="profile-container">
-        <h2>Профиль пользователя</h2>
+            <div class="user-info">
+                <div class="info-row">
+                    <span class="info-label">Имя:</span>
+                    <span class="info-value">{{ user.first_name }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Фамилия:</span>
+                    <span class="info-value">{{ user.last_name }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Email:</span>
+                    <span class="info-value">{{ user.email }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Телефон:</span>
+                    <span class="info-value">{{ user.phone_number }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Роль:</span>
+                    <span class="info-value">
+                        {% if user.role_id == 2 %}Admin
+                        {% elif user.role_id == 1 %}User
+                        {% else %}User{% endif %}
+                    </span>
+                </div>
+            </div>
 
-        <div class="user-info">
-            <div class="info-row">
-                <span class="info-label">Имя:</span>
-                <span class="info-value">{{ user.first_name }}</span>
-            </div>
-            <div class="info-row">
-                <span class="info-label">Фамилия:</span>
-                <span class="info-value">{{ user.last_name }}</span>
-            </div>
-            <div class="info-row">
-                <span class="info-label">Email:</span>
-                <span class="info-value">{{ user.email }}</span>
-            </div>
-            <div class="info-row">
-                <span class="info-label">Телефон:</span>
-                <span class="info-value">{{ user.phone_number }}</span>
-            </div>
-            <div class="info-row">
-                <span class="info-label">Роль:</span>
-                <span class="info-value">
-                    {% if user.role_id == 2 %}Admin
-                    {% elif user.role_id == 1 %}User
-                    {% else %}User{% endif %}
-                </span>
-            </div>
+            {% if user.role_id == 2 %}
+            <form action="/api/v1/users/" class="logout-form">
+                <button type="submit" class="role-btn">Админ панель</button>
+            </form>
+            {% endif %}
+
+            <form action="/api/v1/auth/logout" method="post" class="logout-form">
+                <button type="submit" class="logout-btn">Выйти</button>
+            </form>
+
+
         </div>
-
-        {% if user.role_id == 2 %}
-        <form action="/api/v1/users/" class="logout-form">
-            <button type="submit" class="role-btn">Админ панель</button>
-        </form>
-        {% endif %}
-
-        <form action="/api/v1/auth/logout" method="post" class="logout-form">
-            <button type="submit" class="logout-btn">Выйти</button>
-        </form>
-
-
     </div>
 {% endblock %}

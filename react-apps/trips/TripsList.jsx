@@ -11,12 +11,12 @@ const TripsList = ({ routes, isAuthenticated }) => {
   }
 
   if (routes.length === 0) {
-    return <p className="no-routes">Нет сохранённых маршрутов</p>;
+    return <p className="no-routes">Нет сохранённых путешествий</p>;
   }
 
   return (
     <div className="trips-list">
-      <h2 className="list-title">Мои маршруты</h2>
+      <h2 className="list-title">Мои путешествия</h2>
       <div className="routes-container">
         {routes.map((routeId, index) => (
           <a
@@ -24,7 +24,7 @@ const TripsList = ({ routes, isAuthenticated }) => {
             href={`/api/v1/app/saved_trips/${routeId}`}
             className="route-card"
           >
-            <span className="route-number">Маршрут #{index + 1}</span>
+            <span className="route-number">Путешествие #{index + 1}</span>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
               <path d="M5 12h14M12 5l7 7-7 7"/>
             </svg>

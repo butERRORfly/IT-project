@@ -185,3 +185,10 @@ class TripDao():   # Абстрактный класс - написать
             result = await session.execute(query)
             parameters = result.scalars().all()
             return parameters
+
+    @classmethod
+    async def find_all(cls, **filter_by):
+        async with async_session_maker() as session:
+            query = select(cls.model).filter_by(**filter_by)
+            result = await session.execute(query)
+            return result.scalars().all()

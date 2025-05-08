@@ -14,15 +14,3 @@ async def index(request: Request, user: User = Depends(user_is_auth)):
         "title": "Главная",
         "user": user
     })
-
-# async def index(request: Request):
-#     return main.templates.TemplateResponse(
-#         request=request, name="base.html", context={"title": "Adventures"}
-#     )
-
-
-
-
-# @router.get("/", response_class=HTMLResponse, summary="Домашняя страница")
-# async def home_redirect(request: Request):
-#     return RedirectResponse(url="/auth/login")

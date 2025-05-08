@@ -30,7 +30,7 @@ async def return_page(
 ) -> HTMLResponse:
 
     return templates.TemplateResponse(
-        "form.html",
+        "trips/form.html",
         {
             "request": request,
             "user": user,
@@ -52,13 +52,13 @@ async def search_airports(
 
 @rout.get('/map/', response_class=HTMLResponse, summary="Отображение Yandex Map")
 async def f(request: Request, user: User = Depends(get_current_user)) -> HTMLResponse:
-    return templates.TemplateResponse("map.html", {"request": request, "user": user})
+    return templates.TemplateResponse("trips/map.html", {"request": request, "user": user})
 
 
 @rout.get('/saved_trips/', response_class=HTMLResponse, name="trips", summary="Сохраненные путешествия пользователя")
 async def show_trips_page(request: Request, user: User = Depends(get_current_user)) -> HTMLResponse:
     current = await TripDao.find_all_way_id(user_id=user.id)
-    return templates.TemplateResponse("my_trips.html", {"request": request, "user": user, "current": current})
+    return templates.TemplateResponse("trips/my_trips.html", {"request": request, "user": user, "current": current})
 
 
 @rout.get('/saved_trips/{id_trip:int}', response_class=HTMLResponse, summary="Получить сохраненное путешествие по id")
@@ -93,7 +93,7 @@ async def show_way(request: Request, id_trip: int, possible: list = Depends(lega
                 parametrs['icao'].append(i.icao)
                 parametrs['icao2'].append(i.icao1)
         print(parametrs)
-        return templates.TemplateResponse("saved.html", {"request": request, "data": parametrs, "user": user})
+        return templates.TemplateResponse("trips/saved.html", {"request": request, "data": parametrs, "user": user})
     else:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
@@ -163,7 +163,7 @@ async def submit_data(request: Request, forms: List[FormData], user: User = Depe
         'icao': [i.icao for i in forms],
         'icao2': [i.icao2 for i in forms]
     }
-    return templates.TemplateResponse("map.html", {"request": request, "data": req, "user": user})
+    return templates.TemplateResponse("trips/map.html", {"request": request, "data": req, "user": user})
 
 
 @rout.post("/send/", summary="Отправка созданного путешествия в Базу Данных")

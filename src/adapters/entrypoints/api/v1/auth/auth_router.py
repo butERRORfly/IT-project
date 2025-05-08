@@ -25,7 +25,7 @@ async def register_user(user_data: UserRegister) -> dict:
 
 @router.get("/register/", response_class=HTMLResponse, summary="Страница регистрации")
 async def register_page(request: Request):
-    return templates.TemplateResponse("register.html", {"request": request})
+    return templates.TemplateResponse("auth/register.html", {"request": request})
 
 
 @router.post("/login/", summary="Вход в систему")
@@ -41,7 +41,7 @@ async def auth_user(response: Response, user_data: UserAuth):
 
 @router.get("/login/", response_class=HTMLResponse, summary="Страница вход в систему")
 async def login_page(request: Request):
-    return templates.TemplateResponse("login.html", {"request": request})
+    return templates.TemplateResponse("auth/login.html", {"request": request})
 
 
 @router.post("/logout/", summary="Выход")

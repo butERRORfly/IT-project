@@ -6,6 +6,7 @@ import TotalPrice from './TotalPrice';
 import SaveButton from './SaveButton';
 import ScriptLoader from './ScriptLoader';
 
+
 export default function App({ data }) {
   const [timeData, setTimeData] = useState([]); // Состояние для времени
   const [creatingNewPoint, setCreatingNewPoint] = useState(false);
