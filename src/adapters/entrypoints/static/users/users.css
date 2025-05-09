@@ -344,7 +344,6 @@ main {
 
 .item-1::after {
   content: "Самое популярное место отдыха";
-  font-size: 10px;
   position: absolute;
   bottom: 20%;
   left: 50%;
@@ -356,7 +355,6 @@ main {
 
 .item-2::after {
   content: "Самая популярная гостиница";
-  font-size: 10px;
   position: absolute;
   bottom: 20%;
   left: 50%;
@@ -368,7 +366,6 @@ main {
 
 .item-3::after {
   content: "Самый популярный вид транспорта";
-  font-size: 10px;
   position: absolute;
   bottom: 20%;
   left: 50%;
@@ -380,7 +377,6 @@ main {
 
 .item-4::after {
   content: "Самое популярное время года для путешествий";
-  font-size: 10px;
   position: absolute;
   bottom: 20%;
   left: 50%;

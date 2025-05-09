@@ -3,7 +3,6 @@ import PanoramaContainer from './PanoramaContainer';
 import TrapezoidBlock from './TrapezoidBlock';
 import HeroWithTrapezoid from './HeroWithTrapezoid';
 import Belt from './Belt';
-import Footer from './Footer';
 import ReviewCarousel from './ReviewCarousel';
 
 export default function App({ data }) {
@@ -50,7 +49,6 @@ export default function App({ data }) {
         }}
       />
       <ReviewCarousel />
-      <Footer />
     </div>
   );
 }

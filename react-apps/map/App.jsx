@@ -147,7 +147,7 @@ const handleSave = async () => {
       }));
 
       // Отправка на сервер
-      const response = await fetch('http://127.0.0.1:8000/send', {
+      const response = await fetch('http://127.0.0.1:8000/api/v1/app/send/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -156,7 +156,7 @@ const handleSave = async () => {
       });
 
       if (response.ok) {
-        window.location.href = '/';
+        window.location.href = '/api/v1/';
       } else {
         console.error('Ошибка при сохранении');
       }
