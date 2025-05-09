@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div id="trips-root" style="width: 100%;"
+     data-routes="{{ current | tojson | safe }}"
+     data-is-authenticated="{{ 'true' if user else 'false' }}">
+    </div>
+    <script src="{{ url_for('static_front', path='bundle-trips.js') }}" type="module"></script>
+{% endblock %}

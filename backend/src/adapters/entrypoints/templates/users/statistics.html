@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <link rel="stylesheet" href="{{ url_for('static', path='users/users.css') }}">
+    <div class="container_block_inner">
+          <div class="overlay"></div>
+          <div class="burger-menu">
+          <button class="burger-button" id="burgerBtn">›</button>
+
+              <h2>Adventures</h2>
+              <ul>
+                  <li><a href="/api/v1/">Главная</a></li>
+                  <li><a href="/api/v1/users/?">Пользователи</a></li>
+                  <li><a href="/api/v1/users/statistics/">Статистика</a></li>
+                  <form action="/api/v1/auth/logout" method="post" class="logout-form">
+                      <button type="submit" class="logout-btn">Выйти</button>
+                  </form>
+              </ul>
+          </div>
+          <h1>Статистика</h1>
+          <p>Вы вошли как: {{ admin.first_name }} {{ admin.last_name }} ({{ admin.email }})</p>
+          <div class="parent-container">
+              <div class="grid-item item-1"><h1>{{ total_trips }}</h1></div>
+              <div class="grid-item item-2"><h1>{{ max_count_of_hotels }}</h1></div>
+              <div class="grid-item item-3"><h1>{% if max_count_of_transport_type == 'poliline' %}Самолет{% else %}Машина{% endif %}</h1></div>
+              <div class="grid-item item-4"><h1>{{ max_count_of_date }}</h1></div>
+          </div>
+
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const burgerButton = document.querySelector('.burger-button');
+            const burgerMenu = document.querySelector('.burger-menu');
+            const overlay = document.querySelector('.overlay');
+            const container = document.querySelector('.container_block_inner');
+
+            burgerButton.addEventListener('click', function() {
+                burgerMenu.classList.toggle('open');
+                overlay.classList.toggle('active');
+                container.classList.toggle('menu-open');
+            });
+
+            overlay.addEventListener('click', function() {
+                burgerMenu.classList.remove('open');
+                overlay.classList.remove('active');
+                container.classList.remove('menu-open');
+                burgerButton.classList.remove('hidden');
+            });
+
+            document.querySelectorAll('.burger-menu a').forEach(link => {
+                link.addEventListener('click', function() {
+                    burgerMenu.classList.remove('open');
+                    overlay.classList.remove('active');
+                    container.classList.remove('menu-open');
+                });
+            });
+        });
+
+        document.getElementById('burgerBtn').addEventListener('click', function() {
+            this.classList.add('hidden');
+        });
+    </script>
+{% endblock %}

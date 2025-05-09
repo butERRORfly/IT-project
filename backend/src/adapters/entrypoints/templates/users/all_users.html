@@ -1,0 +1,273 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<link rel="stylesheet" href="{{ url_for('static', path='users/users.css') }}">
+
+    <title>Список пользователей</title>
+
+    <div class="container_block_inner">
+
+        <div class="overlay"></div>
+        <div class="burger-menu">
+        <button class="burger-button" id="burgerBtn">›</button>
+
+            <h2>Adventures</h2>
+            <ul>
+                <li><a href="/api/v1/">Главная</a></li>
+                <li><a href="/api/v1/users/?">Пользователи</a></li>
+                <li><a href="/api/v1/users/statistics/">Статистика</a></li>
+                <form action="/api/v1/auth/logout" method="post" class="logout-form">
+                    <button type="submit" class="logout-btn">Выйти</button>
+                </form>
+            </ul>
+        </div>
+        <h1>Список пользователей</h1>
+        <p>Вы вошли как: {{ admin.first_name }} {{ admin.last_name }} ({{ admin.email }})</p>
+
+        <div class="filters">
+            <form method="get" action="/api/v1/users/" id="roleFilterForm">
+                <select name="role_id" id="roleSelect">
+                    <option value="">Все роли</option>
+                    <option value="1" {% if current_role_filter == 1 %}selected{% endif %}>User</option>
+                    <option value="2" {% if current_role_filter == 2 %}selected{% endif %}>Admin</option>
+                </select>
+                <input type="hidden" name="page" value="1">
+            </form>
+            <div class="search-container">
+                <input
+                    type="text"
+                    id="searchInput"
+                    class="searchClass"
+                    placeholder="Поиск пользователей..."
+                    autocomplete="off"
+                >
+                <div id="searchResults" class="search-results"></div>
+            </div>
+            </form>
+        </div>
+
+        <div class="static-card">
+            <div class="static">
+                <div class="static-logo-inner-1">
+                    <div class="static-image-container-1"></div>
+                </div>
+                <div class="static-div-h">
+                    <div class="static-div-h-inner">
+                        <h1 class="static-h1">{{ total_users }}</h1>
+                    </div>
+                </div>
+            </div>
+            <div class="static">
+                <div class="static-logo-inner-2">
+                    <div class="static-image-container-2"></div>
+                </div>
+                <div class="static-div-h">
+                    <div class="static-div-h-inner">
+                        <h1 class="static-h2">{{ total_trips }}</h1>
+                    </div>
+                </div>
+            </div>
+            <div class="static">
+                <div class="static-logo-inner-3">
+                    <div class="static-image-container-3"></div>
+                </div>
+                <div class="static-div-h">
+                    <div class="static-div-h-inner">
+                        <h1 class="static-h3">{{ total_roles }}</h1>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="users-container">
+            {% for user in users %}
+            <div class="user-card">
+                <h3>{{ user.first_name }} {{ user.last_name }}</h3>
+                <p>Email: {{ user.email }}</p>
+                <p>Телефон: {{ user.phone_number }}</p>
+                <p>ID: {{ user.id }}</p>
+                <span class="info-label">Роль:</span>
+                <span class="info-value">
+                    {% if user.role.id == 2 %}Admin
+                    {% elif user.role.id == 1 %}User
+                    {% endif %}
+                </span>
+                <a href="/api/v1/users/{{ user.id }}/">Подробнее</a>
+            </div>
+            {% endfor %}
+        </div>
+
+        {% if total_pages > 1 %}
+        <div class="pagination">
+        {% if page > 1 %}
+            <a class="pagination_href" href="?{% if current_role_filter %}role_id={{ current_role_filter }}&{% endif %}page={{ page - 1 }}">Предыдущая</a>
+        {% endif %}
+
+        {% for p in range(1, total_pages + 1) %}
+            {% if p == page %}
+                <a href="?{% if current_role_filter %}role_id={{ current_role_filter }}&{% endif %}page={{ p }}" class="active">{{ p }}</a>
+            {% else %}
+                <a class="pagination_href" href="?{% if current_role_filter %}role_id={{ current_role_filter }}&{% endif %}page={{ p }}">{{ p }}</a>
+            {% endif %}
+        {% endfor %}
+
+        {% if page < total_pages %}
+            <a class="pagination_href" href="?{% if current_role_filter %}role_id={{ current_role_filter }}&{% endif %}page={{ page + 1 }}">Следующая</a>
+        {% endif %}
+        </div>
+        {% endif %}
+    </div>
+    <script>
+    document.getElementById('roleSelect').addEventListener('change', function() {
+        const form = document.getElementById('roleFilterForm');
+        const roleValue = this.value;
+
+        form.querySelector('input[name="page"]').value = 1;
+
+        if (roleValue === "") {
+            window.location.href = "/api/v1/users/";
+        } else {
+            form.submit();
+        }
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('searchInput');
+        const searchResults = document.getElementById('searchResults');
+        let debounceTimer;
+
+        // Функция для выполнения поиска
+        async function performSearch(query) {
+            if (query.length < 2) {
+                searchResults.style.display = 'none';
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/v1/users/filter?name=${encodeURIComponent(query)}&limit=5`);
+                const users = await response.json();
+
+                displayResults(users, query);
+            } catch (error) {
+                console.error('Ошибка поиска:', error);
+                searchResults.style.display = 'none';
+            }
+        }
+
+        // Функция для отображения результатов
+        function displayResults(users, query) {
+            if (!users || users.length === 0) {
+                searchResults.innerHTML = '<div class="search-result-item">Ничего не найдено</div>';
+                searchResults.style.display = 'block';
+                return;
+            }
+
+            searchResults.innerHTML = '';
+            users.forEach(user => {
+                const item = document.createElement('div');
+                item.className = 'search-result-item';
+
+                // Подсветка совпадений
+                const firstName = highlightMatches(user.first_name, query);
+                const lastName = highlightMatches(user.last_name, query);
+
+                item.innerHTML = `
+                    <div><strong>${firstName} ${lastName}</strong></div>
+                    <div>${user.email}</div>
+                    <div>${user.phone_number}</div>
+                `;
+
+                item.addEventListener('click', () => {
+                    window.location.href = `/api/v1/users/${user.id}/`;
+                });
+
+                searchResults.appendChild(item);
+            });
+
+            searchResults.style.display = 'block';
+        }
+
+        // Функция для подсветки совпадений
+        function highlightMatches(text, query) {
+            if (!query) return text;
+            const regex = new RegExp(query, 'gi');
+            return text.replace(regex, match => `<span class="highlight">${match}</span>`);
+        }
+
+        // Обработчик ввода с debounce
+        searchInput.addEventListener('input', function() {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => {
+                performSearch(this.value.trim());
+            }, 300);
+        });
+
+        // Скрываем результаты при клике вне поля поиска
+        document.addEventListener('click', function(e) {
+            if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+                searchResults.style.display = 'none';
+            }
+        });
+
+        // Обработчик для выбора результата с клавиатуры
+        searchInput.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowDown' && searchResults.style.display === 'block') {
+                e.preventDefault();
+                const firstItem = searchResults.querySelector('.search-result-item');
+                if (firstItem) firstItem.focus();
+            }
+        });
+
+        searchResults.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                const nextItem = e.target.nextElementSibling;
+                if (nextItem) nextItem.focus();
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                const prevItem = e.target.previousElementSibling;
+                if (prevItem) {
+                    prevItem.focus();
+                } else {
+                    searchInput.focus();
+                }
+            } else if (e.key === 'Enter') {
+                e.target.click();
+            }
+        });
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const burgerButton = document.querySelector('.burger-button');
+        const burgerMenu = document.querySelector('.burger-menu');
+        const overlay = document.querySelector('.overlay');
+        const container = document.querySelector('.container_block_inner');
+
+        burgerButton.addEventListener('click', function() {
+            burgerMenu.classList.toggle('open');
+            overlay.classList.toggle('active');
+            container.classList.toggle('menu-open');
+        });
+
+        overlay.addEventListener('click', function() {
+            burgerMenu.classList.remove('open');
+            overlay.classList.remove('active');
+            container.classList.remove('menu-open');
+            burgerButton.classList.remove('hidden');
+        });
+
+        document.querySelectorAll('.burger-menu a').forEach(link => {
+            link.addEventListener('click', function() {
+                burgerMenu.classList.remove('open');
+                overlay.classList.remove('active');
+                container.classList.remove('menu-open');
+            });
+        });
+    });
+
+    document.getElementById('burgerBtn').addEventListener('click', function() {
+        this.classList.add('hidden');
+    });
+    </script>
+{% endblock %}
