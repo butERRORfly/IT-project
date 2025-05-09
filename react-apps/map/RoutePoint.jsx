@@ -2,11 +2,11 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useTimer } from './useTimer';
 import { currencies } from './TotalPrice';
 
-export default function RoutePoint({ location, i, timeData, data, onPointUpdate, prevTypic }) {
+export default function RoutePoint({ location, i, timeData, data, onPointUpdate, prevTypic, initialPointsCount }) {
   const timeInfo = timeData.find(item => item.id === i) || {};
   const displayTime = useTimer(timeInfo.time);
 
-  const [editMode, setEditMode] = useState(!data.date_out?.[i]);
+  const [editMode, setEditMode] = useState(i >= initialPointsCount);
   const [formData, setFormData] = useState({
     loc: location === '!' ? null : location,
     typic: data.typic?.[i] === '!' ? null : (data.typic?.[i] || 'poliline'),

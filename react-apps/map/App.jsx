@@ -9,6 +9,7 @@ import ScriptLoader from './ScriptLoader';
 export default function App({ data }) {
   const [timeData, setTimeData] = useState([]); // Состояние для времени
   const [creatingNewPoint, setCreatingNewPoint] = useState(false);
+  const [initialPointsCount, setInitialPointsCount] = useState(Array.isArray(data.loc) ? data.loc.length : 0);
   const normalizeData = (rawData) => {
     const normalized = {};
     const fields = ['loc', 'date_to', 'date_out', 'gost', 'wait', 'cost', 'rec', 'air', 'air2', 'icao', 'icao2', 'typic', 'price'];
@@ -28,7 +29,8 @@ export default function App({ data }) {
 
   const normalizedInitialData = normalizeData({
     ...data,
-    cost: data.cost || data.price || []
+    cost: data.cost || data.price || [],
+    gost: data.gost || data.hotel || []
   });
   const [pointsData, setPointsData] = useState(normalizedInitialData); // Состояние для данных точек
   const [totalScoreUSD, setTotalScoreUSD] = useState(0);
@@ -179,7 +181,7 @@ const handleSave = async () => {
       <div className="sidebar-grid">
         <TotalPrice totalScore={normalizedData.total_score} />
         <div className="overlay-container">
-          <PointList data={pointsData} timeData={timeData} onPointUpdate={handlePointUpdate}/>
+          <PointList data={pointsData} timeData={timeData} onPointUpdate={handlePointUpdate} initialPointsCount={initialPointsCount}/>
           {shouldShowAddButton && (
             <button
               className="booking-btn"
