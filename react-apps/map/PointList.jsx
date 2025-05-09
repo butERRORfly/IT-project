@@ -1,7 +1,7 @@
 import React from 'react';
 import RoutePoint from './RoutePoint';
 
-export default function PointList({ data, timeData = [], onPointUpdate }) {
+export default function PointList({ data, timeData = [], onPointUpdate, initialPointsCount }) {
   return (
     <div className="sidebar">
       {data.loc.map((location, i) => (
@@ -13,6 +13,7 @@ export default function PointList({ data, timeData = [], onPointUpdate }) {
           data={data}
           onPointUpdate={onPointUpdate}
           prevTypic={i > 0 ? data.typic?.[i-1] : null}
+          initialPointsCount={initialPointsCount}
         />
       ))}
     </div>
