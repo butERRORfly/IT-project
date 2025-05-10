@@ -14,7 +14,7 @@ import requests
 from fastapi import Query
 
 rout = APIRouter()
-templates = Jinja2Templates(directory="backend/src/adapters/entrypoints/templates")
+templates = Jinja2Templates(directory="/app/backend/src/adapters/entrypoints/templates")
 
 
 @rout.get("/new_trip/", response_class=HTMLResponse, summary="Страница создания нового путешествия")

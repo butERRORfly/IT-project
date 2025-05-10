@@ -6,7 +6,7 @@ from backend.src.infrastructure.db.dao.users import UsersDAO
 from backend.src.domain.schemas.users import UserRegister, UserAuth
 
 router = APIRouter()
-templates = Jinja2Templates(directory="backend/src/adapters/entrypoints/templates")
+templates = Jinja2Templates(directory="/app/backend/src/adapters/entrypoints/templates")
 
 
 @router.post("/register/", summary="Регистрация")

@@ -12,7 +12,7 @@ from math import ceil
 from typing import List
 
 router = APIRouter()
-templates = Jinja2Templates(directory="backend/src/adapters/entrypoints/templates")
+templates = Jinja2Templates(directory="/app/backend/src/adapters/entrypoints/templates")
 
 
 @router.get("/profile/", response_class=HTMLResponse, summary="Профиль пользователя")

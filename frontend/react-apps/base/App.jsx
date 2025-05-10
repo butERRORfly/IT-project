@@ -11,7 +11,7 @@ export default function App({ data }) {
       <PanoramaContainer />
       <Belt
         title="Готовы проложить свой путь?"
-        buttonText="Вперёд!"
+        buttonText="Вперед!"
         texture="stripes"
         overlap="30px"
       />

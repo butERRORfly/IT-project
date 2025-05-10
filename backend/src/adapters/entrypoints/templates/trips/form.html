@@ -57,7 +57,7 @@
 
 </div>
 
-<script src="/backend/src/adapters/entrypoints/static/icao/test.js"></script>
-<script src="/backend/src/adapters/entrypoints/static/icao/autocomplete.js"></script>
+<script src="{{ url_for('static', path='icao/test.js') }}"></script>
+<script src="{{ url_for('static', path='icao/autocomplete.js') }}"></script>
 
 {% endblock %}
