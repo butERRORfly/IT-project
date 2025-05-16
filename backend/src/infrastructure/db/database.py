@@ -1,3 +1,4 @@
+from asyncio import current_task
 from datetime import datetime
 from typing import List
 from typing import Dict, Any
@@ -6,9 +7,12 @@ from sqlalchemy.orm import DeclarativeBase, declared_attr, Mapped, mapped_column
 from sqlalchemy import text, select
 import asyncio
 from datetime import datetime
+from sqlalchemy.ext.asyncio import async_scoped_session, async_sessionmaker
+from asyncio import current_task
 from typing import Annotated, List
 from sqlalchemy import func, ForeignKey, Integer, String, DateTime
-from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncAttrs, AsyncSession
+from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncAttrs, AsyncSession, \
+    async_scoped_session
 from sqlalchemy.orm import DeclarativeBase, declared_attr, Mapped, mapped_column, relationship
 from sqlalchemy import text
 from datetime import datetime
@@ -26,6 +30,8 @@ DATABASE_URL = get_db_url()
 
 engine = create_async_engine(DATABASE_URL)
 async_session_maker = async_sessionmaker(engine, expire_on_commit=False)
+
+Session = async_scoped_session(async_session_maker, scopefunc=current_task)
 
 int_pk = Annotated[int, mapped_column(primary_key=True)]
 str_pk = Annotated[str, mapped_column(primary_key=True)]

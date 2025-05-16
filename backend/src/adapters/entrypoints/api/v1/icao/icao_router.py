@@ -7,7 +7,7 @@ from fastapi.templating import Jinja2Templates
 from backend.src.adapters.entrypoints.utilities.dependencies import get_current_user, get_current_admin_user, legal_way_for_user
 from pydantic import BaseModel
 from datetime import datetime
-from backend.src.infrastructure.db.dao.users import TripDao
+from backend.src.infrastructure.db.dao.trip import TripDao
 from backend.src.infrastructure.db.dao.airport import AirportDAO
 from backend.src.infrastructure.db.database import User
 import requests
@@ -74,7 +74,6 @@ async def show_way(request: Request, id_trip: int, possible: list = Depends(lega
     if id_trip in possible:
         data = await TripDao.find_parameters_by_way_id(way_id=id_trip)
         if data:
-
             for i in data:
                 parametrs['loc'].append(i.place)
                 parametrs['date_to'].append(i.to)

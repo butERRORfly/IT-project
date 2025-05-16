@@ -3,7 +3,8 @@ from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 
 from backend.src.domain.schemas import users
-from backend.src.infrastructure.db.dao.users import UsersDAO, TripDao
+from backend.src.infrastructure.db.dao.users import UsersDAO
+from backend.src.infrastructure.db.dao.trip import TripDao
 from backend.src.infrastructure.db.database import User
 from backend.src.adapters.entrypoints.utilities.dependencies import get_current_user, get_current_admin_user, user_is_auth
 from fastapi import Query

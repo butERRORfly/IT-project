@@ -2,7 +2,8 @@ from fastapi import Request, HTTPException, status, Depends
 from jose import jwt, JWTError
 from datetime import datetime, timezone
 from backend.src.configurator.config import get_auth_data
-from backend.src.infrastructure.db.dao.users import UsersDAO, TripDao
+from backend.src.infrastructure.db.dao.users import UsersDAO
+from backend.src.infrastructure.db.dao.trip import TripDao
 from backend.src.infrastructure.db.database import User
 
 
