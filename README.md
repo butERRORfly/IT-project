@@ -79,6 +79,17 @@ Swagger: `http://localhost:8000/docs`
 ReDoc: `http://localhost:8000/redoc`
 
 <div align = center>
+<h1>Архитектура проекта</h1>
+</div>
+
+<br>
+
+<p align="center">
+  <img src="https://github.com/butERRORfly/IT-project/blob/main/assets/architecture.jpeg" alt="Вход">
+  <br>
+</p>
+
+<div align = center>
 <h1>Структура проекта</h1>
 </div>
 
@@ -272,5 +283,30 @@ ReDoc: `http://localhost:8000/redoc`
   <br>
   <em>Сохраненные путешествия</em>
 </p>
+
+
+<div align = center>
+<h1>Команда</h1>
+</div>
+
+<br>
+
+<ul>
+    <li>Болотов Глеб</li>
+    <li>Калинин Артем</li>
+    <li>Смирнов Кирилл</li>
+    <li>Темников Дмитрий</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
 
 
