@@ -1,30 +1,16 @@
 from asyncio import current_task
 from datetime import datetime
-from typing import List
-from typing import Dict, Any
-from sqlalchemy import create_engine, func, ForeignKey, Integer, String, DateTime
-from sqlalchemy.orm import DeclarativeBase, declared_attr, Mapped, mapped_column, relationship, Session
-from sqlalchemy import text, select
-import asyncio
-from datetime import datetime
-from sqlalchemy.ext.asyncio import async_scoped_session, async_sessionmaker
-from asyncio import current_task
-from typing import Annotated, List
-from sqlalchemy import func, ForeignKey, Integer, String, DateTime
-from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncAttrs, AsyncSession, \
-    async_scoped_session
-from sqlalchemy.orm import DeclarativeBase, declared_attr, Mapped, mapped_column, relationship
-from sqlalchemy import text
-from datetime import datetime
 from typing import Annotated
+from typing import List
+
+from sqlalchemy import String, DateTime
 from sqlalchemy import func, ForeignKey
-from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncAttrs
-from sqlalchemy.orm import DeclarativeBase, declared_attr, Mapped, mapped_column, relationship
 from sqlalchemy import text, Integer
+from sqlalchemy.ext.asyncio import async_scoped_session
+from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
+from sqlalchemy.orm import DeclarativeBase, declared_attr, Mapped, mapped_column, relationship
+
 from backend.src.configurator.config import get_db_url
-import csv
-from sqlalchemy import insert
-import os
 
 DATABASE_URL = get_db_url()
 

@@ -1,10 +1,9 @@
-from typing import List, Optional
+from typing import List
+
+from sqlalchemy import func
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.future import select
-from sqlalchemy import or_, func
-from sqlalchemy.orm import joinedload
 
-from backend.src.domain.models.user import UserD
 from backend.src.domain.ports.trip_repository import TripRepository
 from backend.src.infrastructure.db.database import Way, WayParameter, Session
 
