@@ -220,10 +220,57 @@ ReDoc: `http://localhost:8000/redoc`
 </div>
 
 <p align="center">
-  <img src="URL" alt="Описание" width="500">
+  <img src="https://github.com/butERRORfly/IT-project/blob/main/assets/login.png" alt="Вход">
   <br>
-  <em>Текст подписи</em>
+  <em>Вход в систему</em>
 </p>
 
+<br>
+
+<p align="center">
+  <img src="https://github.com/butERRORfly/IT-project/blob/main/assets/register.png" alt="Вход">
+  <br>
+  <em>Регистрация</em>
+</p>
+
+<br>
+
+<p align="center">
+  <img src="https://github.com/butERRORfly/IT-project/blob/main/assets/admin_panel.png" alt="Вход">
+  <br>
+  <em>Админ панель</em>
+</p>
+
+<br>
+
+<p align="center">
+  <img src="https://github.com/butERRORfly/IT-project/blob/main/assets/statistics.png" alt="Вход">
+  <br>
+  <em>Статистика</em>
+</p>
+
+<br>
+
+<p align="center">
+  <img src="https://github.com/butERRORfly/IT-project/blob/main/assets/map.png" alt="Вход">
+  <br>
+  <em>Создание путешествия</em>
+</p>
+
+<br>
+
+<p align="center">
+  <img src="https://github.com/butERRORfly/IT-project/blob/main/assets/trip_submit.png" alt="Вход">
+  <br>
+  <em>Подтверждение путешествия</em>
+</p>
+
+<br>
+
+<p align="center">
+  <img src="https://github.com/butERRORfly/IT-project/blob/main/assets/saved_trips.png" alt="Вход">
+  <br>
+  <em>Сохраненные путешествия</em>
+</p>
 
 
