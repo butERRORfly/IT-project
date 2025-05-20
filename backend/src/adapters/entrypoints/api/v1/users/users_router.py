@@ -18,7 +18,13 @@ templates = Jinja2Templates(directory="/app/backend/src/adapters/entrypoints/tem
 
 @router.get("/profile/", response_class=HTMLResponse, summary="Профиль пользователя")
 async def profile_page(request: Request, user: User = Depends(get_current_user)):
-    return templates.TemplateResponse("users/profile.html", {"request": request, "user": user})
+    return templates.TemplateResponse(
+        "users/profile.html", {
+            "request": request,
+            "user": user,
+            "title": 'Профиль пользователя',
+        }
+    )
 
 
 @router.get("/", response_class=HTMLResponse, summary="Получить всех пользователей")
@@ -51,6 +57,7 @@ async def get_all_users_html(
             "users": users,
             "user": user,
             "admin": admin_user,
+            "title": "Админ панель",
             "current_role_filter": role_id if role_id is not None else "",
             "page": page,
             "total_pages": total_pages,
@@ -106,6 +113,7 @@ async def get_statistics(
             "max_count_of_hotels": max_count_of_hotels,
             "max_count_of_transport_type": max_count_of_transport_type,
             "max_count_of_date": season,
+            "title": "Статистика",
         }
     )
 
@@ -128,6 +136,7 @@ async def get_user_by_id(
         {
             "request": request,
             "user": user,
+            "title": f"Профиль пользователя id={user.id}",
         }
     )
 
