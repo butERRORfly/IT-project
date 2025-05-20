@@ -85,6 +85,7 @@ class UsersDAO(UserRepository):
             user = result.scalar_one_or_none()
             if user:
                 await session.refresh(user, ['role_rel'])
+                await session.commit()
                 return cls.map_to_domain(user)
             return None
         except SQLAlchemyError as e:

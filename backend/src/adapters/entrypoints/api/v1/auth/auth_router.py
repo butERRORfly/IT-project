@@ -45,7 +45,7 @@ async def login_page(request: Request):
 
 
 @router.post("/logout/", summary="Выход")
-async def logout_user(response: Response):
+async def logout_user():
     redirect_response = RedirectResponse(
         url="/api/v1/auth/login/",
         status_code=status.HTTP_303_SEE_OTHER
