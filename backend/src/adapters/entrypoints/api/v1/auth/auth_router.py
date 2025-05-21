@@ -25,7 +25,12 @@ async def register_user(user_data: UserRegister) -> dict:
 
 @router.get("/register/", response_class=HTMLResponse, summary="Страница регистрации")
 async def register_page(request: Request):
-    return templates.TemplateResponse("auth/register.html", {"request": request})
+    return templates.TemplateResponse(
+        "auth/register.html", {
+            "request": request,
+            "title": "Страница регистрации"
+        }
+    )
 
 
 @router.post("/login/", summary="Вход в систему")
@@ -36,12 +41,20 @@ async def auth_user(response: Response, user_data: UserAuth):
                             detail='Неверная почта или пароль')
     access_token = create_access_token({"sub": str(check.id)})
     response.set_cookie(key="users_access_token", value=access_token, httponly=True)
-    return {'access_token': access_token, 'refresh_token': None}
+    return {
+        'access_token': access_token,
+        'refresh_token': None,
+    }
 
 
 @router.get("/login/", response_class=HTMLResponse, summary="Страница вход в систему")
 async def login_page(request: Request):
-    return templates.TemplateResponse("auth/login.html", {"request": request})
+    return templates.TemplateResponse(
+        "auth/login.html", {
+            "request": request,
+            "title": "Страница вход в систему"
+        }
+    )
 
 
 @router.post("/logout/", summary="Выход")
