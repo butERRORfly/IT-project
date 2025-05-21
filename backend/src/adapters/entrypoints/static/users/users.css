@@ -4,6 +4,7 @@
     margin: 10px 0;
     border-radius: 5px;
 }
+
 .static-card {
     border: 1px solid #ddd;
     padding: 15px;
@@ -12,6 +13,7 @@
     display: flex;
     justify-content: space-between;
 }
+
 .admin-badge {
     background-color: #ff5722;
     color: white;
@@ -19,26 +21,31 @@
     border-radius: 3px;
     font-size: 12px;
 }
+
 .filters {
     margin-bottom: 20px;
     border-radius: 5px;
     display: flex;
     justify-content: space-between;
 }
+
 .filters select {
     padding: 8px;
     border: 1px solid #ddd;
     border-radius: 4px;
     font-size: 16px;
 }
+
 main {
     display: block;
 }
+
 .pagination {
     display: flex;
     justify-content: center;
     margin-top: 20px;
 }
+
 .pagination a {
     margin: 0 5px;
     padding: 5px 10px;
@@ -48,11 +55,13 @@ main {
     text-decoration: none;
     color: black;
 }
+
 .pagination a.active {
     background-color: #007bff;
     color: white;
     border-color: #007bff;
 }
+
 .container_block_inner {
     display: block;
 }
@@ -114,57 +123,57 @@ main {
 }
 
 .static-h1 {
-  font-size: 35px;
-  position: relative;
-  display: inline-block;
-  text-align: center;
+    font-size: 35px;
+    position: relative;
+    display: inline-block;
+    text-align: center;
 }
 
 .static-h2 {
-  font-size: 35px;
-  position: relative;
-  display: inline-block;
-  text-align: center;
+    font-size: 35px;
+    position: relative;
+    display: inline-block;
+    text-align: center;
 }
 
 .static-h3 {
-  font-size: 35px;
-  position: relative;
-  display: inline-block;
-  text-align: center;
+    font-size: 35px;
+    position: relative;
+    display: inline-block;
+    text-align: center;
 }
 
 .static-h1::after {
-  content: "Всего пользователей";
-  font-size: 10px;
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  color: #777;
-  white-space: nowrap;
+    content: "Всего пользователей";
+    font-size: 10px;
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #777;
+    white-space: nowrap;
 }
 
 .static-h2::after {
-  content: "Всего путешествий";
-  font-size: 10px;
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  color: #777;
-  white-space: nowrap;
+    content: "Всего путешествий";
+    font-size: 10px;
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #777;
+    white-space: nowrap;
 }
 
 .static-h3::after {
-  content: "Всего ролей";
-  font-size: 10px;
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  color: #777;
-  white-space: nowrap;
+    content: "Всего ролей";
+    font-size: 10px;
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #777;
+    white-space: nowrap;
 }
 
 .searchClass {
@@ -179,6 +188,7 @@ main {
 .search-container {
     position: relative;
 }
+
 .search-results {
     position: absolute;
     top: 100%;
@@ -192,14 +202,17 @@ main {
     z-index: 1000;
     display: none;
 }
+
 .search-result-item {
     padding: 10px;
     cursor: pointer;
     border-bottom: 1px solid #eee;
 }
+
 .search-result-item:hover {
     background-color: #f5f5f5;
 }
+
 .highlight {
     background-color: yellow;
     font-weight: bold;
@@ -313,8 +326,8 @@ main {
     display: grid;
     margin-bottom: 30px;
     grid-template-columns: 1fr 1fr; /* 2 колонки */
-    grid-template-rows: 1fr 1fr;    /* 2 строки */
-    gap: 10px;                      /* промежуток между блоками */
+    grid-template-rows: 1fr 1fr; /* 2 строки */
+    gap: 10px; /* промежуток между блоками */
     padding: 10px;
     box-sizing: border-box;
 }
@@ -334,54 +347,81 @@ main {
 .grid-item:hover {
     background-color: #e0e0e0;
     transform: scale(1.02);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-.item-1 { background-color: #ffdddd; }
-.item-2 { background-color: #ddffdd; }
-.item-3 { background-color: #ddddff; }
-.item-4 { background-color: #ffffdd; }
+.item-1 {
+    background-color: #ffdddd;
+}
+
+.item-2 {
+    background-color: #ddffdd;
+}
+
+.item-3 {
+    background-color: #ddddff;
+}
+
+.item-4 {
+    background-color: #ffffdd;
+}
 
 .item-1::after {
-  content: "Самое популярное место отдыха";
-  position: absolute;
-  bottom: 20%;
-  left: 50%;
-  transform: translateX(-50%);
-  color: #777;
-  font-size: 20px;
-  white-space: nowrap;
+    content: "Самое популярное место отдыха";
+    position: absolute;
+    bottom: 20%;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #777;
+    font-size: 20px;
+    white-space: nowrap;
 }
 
 .item-2::after {
-  content: "Самая популярная гостиница";
-  position: absolute;
-  bottom: 20%;
-  left: 50%;
-  transform: translateX(-50%);
-  color: #777;
-  font-size: 20px;
-  white-space: nowrap;
+    content: "Самая популярная гостиница";
+    position: absolute;
+    bottom: 20%;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #777;
+    font-size: 20px;
+    white-space: nowrap;
 }
 
 .item-3::after {
-  content: "Самый популярный вид транспорта";
-  position: absolute;
-  bottom: 20%;
-  left: 50%;
-  transform: translateX(-50%);
-  color: #777;
-  font-size: 20px;
-  white-space: nowrap;
+    content: "Самый популярный вид транспорта";
+    position: absolute;
+    bottom: 20%;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #777;
+    font-size: 20px;
+    white-space: nowrap;
 }
 
 .item-4::after {
-  content: "Самое популярное время года для путешествий";
-  position: absolute;
-  bottom: 20%;
-  left: 50%;
-  transform: translateX(-50%);
-  color: #777;
-  font-size: 20px;
-  white-space: nowrap;
+    content: "Самое популярное время года для путешествий";
+    position: absolute;
+    bottom: 20%;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #777;
+    font-size: 20px;
+    white-space: nowrap;
+}
+
+.logout-btn {
+    display: block;
+    width: 100%;
+    max-width: 140px;
+    padding: 0.75rem;
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    text-align: center;
+    text-decoration: none;
+    margin-bottom: 10px;
 }
