@@ -44,10 +44,10 @@ function addForm() {
     typeWay.id = `type_way-${formCount}`;
     const option1 = document.createElement('option');
     option1.value = 'car';
-    option1.textContent = 'car';
+    option1.textContent = 'Машина';
     const option2 = document.createElement('option');
     option2.value = 'poliline';
-    option2.textContent = 'poliline';
+    option2.textContent = 'Самолет';
     typeWay.appendChild(option1);
     typeWay.appendChild(option2);
     typeWay.value = 'poliline';

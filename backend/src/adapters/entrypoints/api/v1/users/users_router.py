@@ -2,6 +2,8 @@ from fastapi import APIRouter, HTTPException, status, Depends, Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 
+from backend.src.adapters.entrypoints.utilities.paginator import Paginator
+from backend.src.adapters.entrypoints.utilities.statistics import StatisticsService
 from backend.src.domain.schemas import users
 from backend.src.infrastructure.db.dao.users import UsersDAO
 from backend.src.infrastructure.db.dao.trip import TripDao
@@ -9,7 +11,6 @@ from backend.src.infrastructure.db.database import User
 from backend.src.adapters.entrypoints.utilities.dependencies import get_current_user, get_current_admin_user, user_is_auth
 from fastapi import Query
 from typing import Optional
-from math import ceil
 from typing import List
 
 router = APIRouter()
@@ -35,20 +36,13 @@ async def get_all_users_html(
         admin_user: User = Depends(get_current_admin_user),
         user: User = Depends(user_is_auth)
 ):
-    PER_PAGE = 5
-
     all_users = await UsersDAO.find_all_by_role(role_id if role_id != 0 else None)
-    total_users = len(all_users)
-    total_pages = ceil(total_users / PER_PAGE) if total_users > 0 else 1
-
-    page = min(page, total_pages)
-
-    start = (page - 1) * PER_PAGE
-    end = start + PER_PAGE
-    users = all_users[start:end]
-
     total_trips = await TripDao.find_all()
     total_roles = await UsersDAO.get_all_roles()
+    total_users = len(all_users)
+
+    paginator = Paginator(all_users)
+    users, pagination_data = paginator.get_page(page)
 
     return templates.TemplateResponse(
         "users/all_users.html",
@@ -60,7 +54,7 @@ async def get_all_users_html(
             "title": "Админ панель",
             "current_role_filter": role_id if role_id is not None else "",
             "page": page,
-            "total_pages": total_pages,
+            **pagination_data,
             "total_users": total_users,
             "total_trips": len(total_trips),
             "total_roles": len(total_roles),
@@ -86,22 +80,7 @@ async def get_statistics(
         user: User = Depends(user_is_auth),
         admin_user: User = Depends(get_current_admin_user),
 ):
-    max_count_of_trips = await TripDao.find_max_count('place')
-    max_count_of_hotels = await TripDao.find_max_count('hotel')
-    max_count_of_transport_type = await TripDao.find_max_count('type')
-    max_count_of_date = await TripDao.find_max_count('out')
-
-    seasons = {
-        'Зима': ['01', '02', '03'],
-        'Весна': ['04', '05', '06'],
-        'Лето': ['07', '08', '09'],
-        'Осень': ['10', '11', '12'],
-    }
-
-    season = ''
-    for i in seasons.keys():
-        if max_count_of_date[5:7] in seasons[i]:
-            season = i
+    stats = await StatisticsService.get_trip_statistics()
 
     return templates.TemplateResponse(
         "users/statistics.html",
@@ -109,10 +88,10 @@ async def get_statistics(
             "request": request,
             "user": user,
             "admin": admin_user,
-            "total_trips": max_count_of_trips,
-            "max_count_of_hotels": max_count_of_hotels,
-            "max_count_of_transport_type": max_count_of_transport_type,
-            "max_count_of_date": season,
+            "total_trips": stats['most_popular_place'],
+            "max_count_of_hotels": stats['most_popular_hotel'],
+            "max_count_of_transport_type": stats['most_popular_transport'],
+            "max_count_of_date": stats['season'],
             "title": "Статистика",
         }
     )

@@ -10,6 +10,7 @@ from datetime import datetime
 from backend.src.infrastructure.db.dao.trip import TripDao
 from backend.src.infrastructure.db.dao.airport import AirportDAO
 from backend.src.infrastructure.db.database import User
+from backend.src.configurator.config import get_api_key
 import requests
 from fastapi import Query
 
@@ -185,7 +186,6 @@ async def save_users_route(request: Request, forms: List[RouteData], user: User 
     if personal_way is not None:
         trip = await TripDao.add_point_way(way_id=personal_way.id, data=[route.dict() for route in forms])
         if trip is not None:
-            print('way was saved')
             return {'message': 'Was was sucesseful saved!'}
 
 
@@ -193,14 +193,12 @@ async def save_users_route(request: Request, forms: List[RouteData], user: User 
 async def receive_coordinates(payload: CoordinatesPayload) -> dict:
     latitude = payload.latitude
     longitude = payload.longitude
-    API_KEY = '17EMDDSCAKIF'
+    API_KEY = get_api_key()
     url = f"http://api.timezonedb.com/v2.1/get-time-zone?key={API_KEY}&format=json&by=position&lat={latitude}&lng={longitude}";
     try:
         response = requests.get(url)
         response.raise_for_status()
         data = response.json()
-        print(data)
         return data
     except requests.exceptions.RequestException as e:
-        print(f"Ошибка при запросе к TimezoneDB API: {e}")
         return {'status': "ERROR"}

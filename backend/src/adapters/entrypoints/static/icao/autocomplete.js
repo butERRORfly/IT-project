@@ -67,6 +67,9 @@ function showSuggestions(dropdown, suggestions, inputField, linkedField, isIcao 
 
 // Инициализация автодополнения для поля
 function initAutocomplete(inputField, linkedField, isIcao = false) {
+    if (inputField.dataset.autocompleteInitialized === 'true') return;
+    inputField.dataset.autocompleteInitialized = 'true';
+
     const container = inputField.parentElement;
     const dropdown = createDropdown(inputField.id, isIcao);
     container.appendChild(dropdown);
@@ -99,12 +102,12 @@ function initAutocomplete(inputField, linkedField, isIcao = false) {
 
 // Инициализация автодополнения для всех форм
 function initAllAutocompletes() {
-    // Обработка полей air- (аэропорт прилета) и icao- (ICAO прилета)
+    // air- и icao-
     document.querySelectorAll('[id^="air-"]').forEach((input) => {
         const linkedId = input.id.replace('air-', 'icao-');
         const linkedField = document.getElementById(linkedId);
         if (input && linkedField) {
-            initAutocomplete(input, linkedField, false); // false - поле для названия аэропорта
+            initAutocomplete(input, linkedField, false);
         }
     });
 
@@ -112,16 +115,16 @@ function initAllAutocompletes() {
         const linkedId = input.id.replace('icao-', 'air-');
         const linkedField = document.getElementById(linkedId);
         if (input && linkedField) {
-            initAutocomplete(input, linkedField, true); // true - поле для ICAO кода
+            initAutocomplete(input, linkedField, true);
         }
     });
 
-    // Обработка полей air2- (аэропорт вылета) и icao2- (ICAO вылета)
+    // air2- и icao2-
     document.querySelectorAll('[id^="air2-"]').forEach((input) => {
         const linkedId = input.id.replace('air2-', 'icao2-');
         const linkedField = document.getElementById(linkedId);
         if (input && linkedField) {
-            initAutocomplete(input, linkedField, false); // false - поле для названия аэропорта
+            initAutocomplete(input, linkedField, false);
         }
     });
 
@@ -129,12 +132,23 @@ function initAllAutocompletes() {
         const linkedId = input.id.replace('icao2-', 'air2-');
         const linkedField = document.getElementById(linkedId);
         if (input && linkedField) {
-            initAutocomplete(input, linkedField, true); // true - поле для ICAO кода
+            initAutocomplete(input, linkedField, true);
         }
     });
 }
 
-// Вызываем инициализацию при загрузке
+function observeAutocompleteInputs() {
+    const observer = new MutationObserver(() => {
+        initAllAutocompletes();
+    });
+
+    observer.observe(document.body, {
+        childList: true,
+        subtree: true
+    });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     initAllAutocompletes();
+    observeAutocompleteInputs();
 });

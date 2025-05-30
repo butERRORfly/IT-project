@@ -158,7 +158,7 @@ export default function App({data}) {
             });
 
             if (response.ok) {
-                window.location.href = '/api/v1/';
+                window.location.href = '/';
             } else {
                 console.error('Ошибка при сохранении');
             }
