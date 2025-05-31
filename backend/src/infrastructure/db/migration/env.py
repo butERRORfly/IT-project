@@ -6,14 +6,13 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 from alembic import context
 
 import sys
-from os.path import dirname, abspath
+from pathlib import Path
+sys.path.append(str(Path(__file__).parent.parent.parent.parent.parent.parent))
 
-sys.path.insert(0, dirname(dirname(abspath(__file__))))
-
-from src.infrastructure.db.database import DATABASE_URL, Base
+from backend.src.infrastructure.db.database import DATABASE_URL, Base
 
 config = context.config
-config.set_main_option("sqlalchemy.url", DATABASE_URL)
+config.set_main_option("sqlalchemy.url", "postgresql+asyncpg://xololibra:kp0j_b1753@localhost:5434/postgres")
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 

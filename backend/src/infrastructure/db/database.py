@@ -74,13 +74,17 @@ class WayParameter(Base):
     out: Mapped[str_null_true]
     airto: Mapped[str_null_true]
     airout: Mapped[str_null_true]
-    icao: Mapped[str_null_true]
-    icao1: Mapped[str_null_true]
+
+    icao: Mapped[str_null_true] = mapped_column(String, ForeignKey("icao.icao"))
+    icao1: Mapped[str_null_true] = mapped_column(String, ForeignKey("icao.icao"))
+
     hotel: Mapped[str_null_true]
     price: Mapped[str_null_true]
     type: Mapped[str_null_true]
 
     way: Mapped["Way"] = relationship(back_populates="parameters")
+    airport_icao_rel: Mapped["Airport"] = relationship(foreign_keys=[icao], back_populates="way_params_as_icao")
+    airport_icao1_rel: Mapped["Airport"] = relationship(foreign_keys=[icao1], back_populates="way_params_as_icao1")
 
     def __repr__(self):
         return f"{self.__class__.__name__}(id={self.id})"
@@ -102,3 +106,15 @@ class Airport(Base):
 
     icao: Mapped[str_pk]
     name: Mapped[str_not_null]
+
+    way_params_as_icao: Mapped[List["WayParameter"]] = relationship(
+        back_populates="airport_icao_rel",
+        foreign_keys="[WayParameter.icao]"
+    )
+    way_params_as_icao1: Mapped[List["WayParameter"]] = relationship(
+        back_populates="airport_icao1_rel",
+        foreign_keys="[WayParameter.icao1]"
+    )
+
+    def __repr__(self):
+        return f"{self.__class__.__name__}(icao='{self.icao}', name='{self.name}')"
